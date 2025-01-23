@@ -7,8 +7,8 @@ export default function Lab1() {
         <ol id="wd-pancakes">
             <li>Lauren Cummings</li>
             <li>Online Section</li>
-            <li>http://localhost:5176/labs#/Kambaz/Account/Signin</li>
-            <li>http://localhost:5176/labs#/Labs/Lab1</li>
+            <li>https://a1--kambaz-react-app.netlify.app/#/Labs/Lab1</li>
+            <li>https://a1--kambaz-react-app.netlify.app/#/Kambaz/Account/Signin</li>
             <li>https://github.com/Laurennc33/kambaz-react-web-app/tree/a1</li>
         </ol>
         </div>
