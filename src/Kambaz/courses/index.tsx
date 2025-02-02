@@ -11,12 +11,7 @@ export default function Courses() {
     <div id="wd-courses">
       <h2>Course 1234</h2>
       <hr />
-      <table>
-        <tr>
-          <td valign="top">
-            <CourseNavigation />
-          </td>
-          <td valign="top">
+          <CourseNavigation />
             <Routes>
               <Route path="/" element={<Navigate to="Home" />} />
               <Route path="Home" element={<Home />} />
@@ -29,9 +24,6 @@ export default function Courses() {
               <Route path="Piazza" element={<h3>Piazza</h3> } />
               <Route path="People" element={<h3>People</h3>} />
             </Routes>
-          </td>
-        </tr>
-      </table>
     </div>
   );
 }
