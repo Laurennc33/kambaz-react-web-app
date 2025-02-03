@@ -1,3 +1,7 @@
+import Button from "react-bootstrap/esm/Button";
+import Card from "react-bootstrap/esm/Card";
+import Col from "react-bootstrap/esm/Col";
+import Row from "react-bootstrap/esm/Row";
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
@@ -6,102 +10,182 @@ export default function Dashboard() {
       <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
       <h2 id="wd-dashboard-published">Published Courses (7)</h2> <hr />
       <div id="wd-dashboard-courses">
-        <div className="wd-dashboard-course">
-          <Link to="/Kambaz/Courses/1234/Home"
-                className="wd-dashboard-course-link">
-            <img src="/images/reactjs.jpg" width={200} />
-            <div>
-              <h5>CS1234 React JS</h5>
-              <p className="wd-dashboard-course-title">
-                Full Stack Software Developer</p>
-              <button>Go</button>
-            </div>
-          </Link>
-        </div>
+        <Row xs={1} md={5} className="g-4">
+          <Col className="wd-dashboard-course" style={{ width: "300px" }}>
+            <Card>
+              <Link
+                to="/Kambaz/Courses/1234/Home"
+                className="wd-dashboard-course-link text-decoration-none text-dark"
+              >
+                <Card.Img
+                  variant="top"
+                  src="/images/reactjs.jpg"
+                  width="100%"
+                  height={160}
+                />
+                <Card.Body>
+                  <Card.Title className="wd-dashboard-course-title">
+                    CS1234 React JS
+                  </Card.Title>
+                  <Card.Text className="wd-dashboard-course-description">
+                    Full Stack Software Developer
+                  </Card.Text>
+                  <Button variant="primary">Go</Button>
+                </Card.Body>
+              </Link>
+            </Card>
+          </Col>
 
+          <Col className="wd-dashboard-course" style={{ width: "300px" }}>
+            <Card>
+              <Link
+                to="/Kambaz/Courses/2234/Home"
+                className="wd-dashboard-course-link text-decoration-none text-dark"
+              >
+                <Card.Img
+                  variant="top"
+                  src="/images/biology.jpg"
+                  width="100%"
+                  height={160}
+                />
+                <Card.Body>
+                  <Card.Title className="wd-dashboard-course-title">
+                    Bio1122
+                  </Card.Title>
+                  <Card.Text className="wd-dashboard-course-description">
+                    Introduction to Biology
+                  </Card.Text>
+                  <Button variant="primary">Go</Button>
+                </Card.Body>
+              </Link>
+            </Card>
+          </Col>
 
-        <div className="wd-dashboard-course">
-          <Link to="/Kambaz/Courses/2234/Home"
-                className="wd-dashboard-course-link">
-            <img src="/images/biology.jpg" width={200} />
-            <div>
-              <h5>Bio1122</h5>
-              <p className="wd-dashboard-course-title">
-                Introduction to Biology</p>
-              <button>Go</button>
-            </div>
-          </Link>
-        </div>
+          <Col className="wd-dashboard-course" style={{ width: "300px" }}>
+            <Card>
+              <Link
+                to="/Kambaz/Courses/3234/Home"
+                className="wd-dashboard-course-link text-decoration-none text-dark"
+              >
+                <Card.Img
+                  variant="top"
+                  src="/images/python.jpg"
+                  width="100%"
+                  height={160}
+                />
+                <Card.Body>
+                  <Card.Title className="wd-dashboard-course-title">
+                    CS3234 Python
+                  </Card.Title>
+                  <Card.Text className="wd-dashboard-course-description">
+                    Data Science and Machine Learning
+                  </Card.Text>
+                  <Button variant="primary">Go</Button>
+                </Card.Body>
+              </Link>
+            </Card>
+          </Col>
 
+          <Col className="wd-dashboard-course" style={{ width: "300px" }}>
+            <Card>
+              <Link
+                to="/Kambaz/Courses/4234/Home"
+                className="wd-dashboard-course-link text-decoration-none text-dark"
+              >
+                <Card.Img
+                  variant="top"
+                  src="/images/linear.jpg"
+                  width="100%"
+                  height={160}
+                />
+                <Card.Body>
+                  <Card.Title className="wd-dashboard-course-title">
+                    Math 3211
+                  </Card.Title>
+                  <Card.Text className="wd-dashboard-course-description">
+                    Linear Algebra
+                  </Card.Text>
+                  <Button variant="primary">Go</Button>
+                </Card.Body>
+              </Link>
+            </Card>
+          </Col>
 
-        <div className="wd-dashboard-course">
-          <Link to="/Kambaz/Courses/3234/Home"
-                className="wd-dashboard-course-link">
-            <img src="/images/python.jpg" width={200} />
-            <div>
-              <h5>CS3234 Python</h5>
-              <p className="wd-dashboard-course-title">
-                Data Science and Machine Learning</p>
-              <button>Go</button>
-            </div>
-          </Link>
-        </div>
+          <Col className="wd-dashboard-course" style={{ width: "300px" }}>
+            <Card>
+              <Link
+                to="/Kambaz/Courses/5234/Home"
+                className="wd-dashboard-course-link text-decoration-none text-dark"
+              >
+                <Card.Img
+                  variant="top"
+                  src="/images/chemistry.jpg"
+                  width="100%"
+                  height={160}
+                />
+                <Card.Body>
+                  <Card.Title className="wd-dashboard-course-title">
+                    Chem 1113
+                  </Card.Title>
+                  <Card.Text className="wd-dashboard-course-description">
+                    Introduction to Chemistry
+                  </Card.Text>
+                  <Button variant="primary">Go</Button>
+                </Card.Body>
+              </Link>
+            </Card>
+          </Col>
 
+          <Col className="wd-dashboard-course" style={{ width: "300px" }}>
+            <Card>
+              <Link
+                to="/Kambaz/Courses/6234/Home"
+                className="wd-dashboard-course-link text-decoration-none text-dark"
+              >
+                <Card.Img
+                  variant="top"
+                  src="/images/writing.jpg"
+                  width="100%"
+                  height={160}
+                />
+                <Card.Body>
+                  <Card.Title className="wd-dashboard-course-title">
+                    Writing 1111
+                  </Card.Title>
+                  <Card.Text className="wd-dashboard-course-description">
+                    First Year Writing
+                  </Card.Text>
+                  <Button variant="primary">Go</Button>
+                </Card.Body>
+              </Link>
+            </Card>
+          </Col>
 
-        <div className="wd-dashboard-course">
-          <Link to="/Kambaz/Courses/4234/Home"
-                className="wd-dashboard-course-link">
-            <img src="/images/linear.jpg" width={200} />
-            <div>
-              <h5>Math 3211</h5>
-              <p className="wd-dashboard-course-title">
-                Linear Algebra</p>
-              <button>Go</button>
-            </div>
-          </Link>
-        </div>
-
-
-        <div className="wd-dashboard-course">
-          <Link to="/Kambaz/Courses/5234/Home"
-                className="wd-dashboard-course-link">
-            <img src="/images/chemistry.jpg" width={200} />
-            <div>
-              <h5>Chem 1113</h5>
-              <p className="wd-dashboard-course-title">
-                Introduction to Chemistry</p>
-              <button>Go</button>
-            </div>
-          </Link>
-        </div>
-
-
-        <div className="wd-dashboard-course">
-          <Link to="/Kambaz/Courses/6234/Home"
-                className="wd-dashboard-course-link">
-            <img src="/images/writing.jpg" width={200} />
-            <div>
-              <h5>Writing 1111</h5>
-              <p className="wd-dashboard-course-title">
-                First Year Writing</p>
-              <button>Go</button>
-            </div>
-          </Link>
-        </div>
-
-
-        <div className="wd-dashboard-course">
-          <Link to="/Kambaz/Courses/7234/Home"
-                className="wd-dashboard-course-link">
-            <img src="/images/design.jpg" width={200} />
-            <div>
-              <h5>Design 2301</h5>
-              <p className="wd-dashboard-course-title">
-                Desgin for Marketing</p>
-              <button>Go</button>
-            </div>
-          </Link>
-        </div>
+          <Col className="wd-dashboard-course" style={{ width: "300px" }}>
+            <Card>
+              <Link
+                to="/Kambaz/Courses/7234/Home"
+                className="wd-dashboard-course-link text-decoration-none text-dark"
+              >
+                <Card.Img
+                  variant="top"
+                  src="/images/design.jpg"
+                  width="100%"
+                  height={160}
+                />
+                <Card.Body>
+                  <Card.Title className="wd-dashboard-course-title">
+                    Design 2301
+                  </Card.Title>
+                  <Card.Text className="wd-dashboard-course-description">
+                    Design for Marketing
+                  </Card.Text>
+                  <Button variant="primary">Go</Button>
+                </Card.Body>
+              </Link>
+            </Card>
+          </Col>
+        </Row>
       </div>
     </div>
   );

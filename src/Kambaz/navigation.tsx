@@ -14,7 +14,7 @@ export default function KambazNavigation() {
       <ListGroup.Item action className="bg-black text-white border-0 text-center"  href="https://www.northeastern.edu/">Northeastern</ListGroup.Item>
       <ListGroup.Item className="bg-white text-danger border-0 text-center" as={Link} to="/Kambaz/Account"> <IoPersonCircleOutline className="fs-1" /><br />Account</ListGroup.Item>
       <ListGroup.Item className="bg-black text-white border-0 text-center" as={Link} to="/Kambaz/Dashboard"> <AiOutlineDashboard className="fs-1"/><br /> Dashboard</ListGroup.Item>
-      <ListGroup.Item className="bg-black text-white border-0 text-center" as={Link} to="/Kambaz/Dashboard"> <FaBook className="fs-1" /><br />Courses</ListGroup.Item>
+      <ListGroup.Item className="active bg-black text-white border-0 text-center" as={Link} to="/Kambaz/Dashboard"> <FaBook className="fs-1" /><br />Courses</ListGroup.Item>
       <ListGroup.Item className="bg-black text-white border-0 text-center" as={Link} to="/Kambaz/Calendar"> <IoCalendarOutline className="fs-1" /><br /> Calendar</ListGroup.Item>
       <ListGroup.Item className="bg-black text-white border-0 text-center" as={Link} to="/Kambaz/Inbox"> <FaInbox className="fs-1" /><br /> Inbox</ListGroup.Item>
       <ListGroup.Item className="bg-black text-white border-0 text-center" as={Link} to="/Kambaz/History">History</ListGroup.Item>
