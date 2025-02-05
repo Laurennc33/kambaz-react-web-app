@@ -5,13 +5,14 @@ export default function Lab1() {
         <div id="wd-lists">
         <h3>Submission Information:</h3>
         <ol id="wd-pancakes">
-            <li>Lauren Cummings</li>
-            <li>Online Section</li>
-            <li>https://a1--kambaz-react-app.netlify.app/#/Labs/Lab1</li>
-            <li>https://a1--kambaz-react-app.netlify.app/#/Kambaz/Account/Signin</li>
-            <li>https://github.com/Laurennc33/kambaz-react-web-app/tree/a1</li>
+          <li>Lauren Cummings</li>
+          <li>Online Section</li>
+          <li><a href="https://kambaz-react-app.netlify.app/#/Labs/Lab2" target="_blank" rel="noopener noreferrer">https://kambaz-react-app.netlify.app/#/Labs/Lab2</a></li>
+          <li><a href="https://kambaz-react-app.netlify.app/#/Kambaz/Account/Signin" target="_blank" rel="noopener noreferrer">https://kambaz-react-app.netlify.app/#/Kambaz/Account/Signin</a></li>
+          <li><a href="https://github.com/Laurennc33/kambaz-react-web-app/tree/a2" target="_blank" rel="noopener noreferrer">https://github.com/Laurennc33/kambaz-react-web-app/tree/a2</a></li>
         </ol>
         </div>
+
         
         <h3>Headings</h3>
         <p>Headings allow you to break up the content into multiple sections</p>
