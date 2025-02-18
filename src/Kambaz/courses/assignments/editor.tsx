@@ -1,23 +1,29 @@
-import { Form, Button, Row, Col, InputGroup } from 'react-bootstrap';
+import { Form, Row, Col, InputGroup } from 'react-bootstrap';
+import { Link, useParams } from 'react-router';
+import * as db from "../../database";
+
 
 export default function AssignmentEditor() {
+  const { aid } = useParams();
+  const { cid } = useParams();
+  const assignment = db.assignments.find((assignment) => assignment._id === aid);
   return (
     <div id="wd-assignments-editor">
       <Form>
         <Form.Group controlId="wd-name" className="mb-3">
-          <Form.Label>Assignment Name</Form.Label>
-          <Form.Control type="text" defaultValue="A1 - ENV + HTML" />
+          <Form.Label>Assignment Name {aid}</Form.Label>
+          <Form.Control type="text" defaultValue={assignment?.title}/>
         </Form.Group>
 
         <Form.Group controlId="wd-description" className="mb-3">
-          <Form.Label>Description</Form.Label>
-          <Form.Control as="textarea" rows={4} defaultValue="The assignment is available online. Submit a link to the landing page of the assignment." />
+          <Form.Label>Description {aid} </Form.Label>
+          <Form.Control as="textarea" rows={4} defaultValue={assignment?.description}/>
         </Form.Group>
 
         <Row className="mb-3">
           <Form.Group as={Col} controlId="wd-points">
             <Form.Label>Points</Form.Label>
-            <Form.Control type="number" defaultValue={100} />
+            <Form.Control type="number" defaultValue={assignment?.points} />
           </Form.Group>
 
           <Form.Group as={Col} controlId="wd-group">
@@ -101,8 +107,12 @@ export default function AssignmentEditor() {
         </Row>
 
         <div className="wd-buttons">
-          <Button variant="primary" id="wd-save-button">Save</Button>
-          <Button variant="secondary" id="wd-cancel-button" className="ms-2">Cancel</Button>
+          <Link to={`/Kambaz/Courses/${cid}/Assignments`} className="btn btn-primary" id="wd-save-button">
+            Save
+          </Link>
+          <Link to={`/Kambaz/Courses/${cid}/Assignments`} className="btn btn-secondary ms-2" id="wd-cancel-button">
+            Cancel
+          </Link>
         </div>
       </Form>
     </div>
