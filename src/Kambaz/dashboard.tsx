@@ -1,36 +1,50 @@
 import { Link } from "react-router-dom";
-import * as db from "./database";
 import { Button, Card, Col, FormControl, Row } from "react-bootstrap";
-import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useSelector } from "react-redux";
+import * as db from "./database";
 
-export default function Dashboard() {
-  const [courses, setCourses = useState<any[]>(db.courses);
-  const [course, setCourse] = useState<any>({
-    _id: "0", name: "New Course", number: "New Number",
-    startDate: "2023-09-10", endDate: "2023-12-15",
-    image: "/images/reactjs.jpg", description: "New Description"
-  });
-  const addNewCourse = () => {
-    const newCourse = { ...course, _id: uuidv4() };
-    setCourses([...courses, newCourse ]);
-  };
+
+export default function Dashboard( {
+  courses, 
+  course, 
+  setCourse, 
+  addCourse,
+  deleteCourse, 
+  updateCourse }: 
+  {
+  courses: any[]; 
+  course: any; 
+  setCourse: (course: any) => void;
+  addCourse: () => void; 
+  deleteCourse: (courseId: string) => void;
+  updateCourse: () => void; })
+ {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const { enrollments } = db;
 
   return (
     <div id="wd-dashboard">
       <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
-      <h5>New Course
-        <button className="btn btn-primary float-end"
-              id="wd-add-new-course-click"
-              onClick={addNewCourse} > Add </button>
-      </h5><hr />
-      <br />
-      <FormControl value={course.name} className="mb-2" />
-      <FormControl value={course.description} rows={3}/>
-      <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2> <hr />
+      {currentUser && currentUser.role === "ADMIN" && (
+        <>
+          <h2> Course Editor</h2>
+          <Button variant="success" onClick={updateCourse} className="float-end"> Update Course </Button>
+          <Button onClick={addCourse} className="float-end"> Add New Course </Button>
+          <FormControl onChange={(e) => {setCourse({...course, name: e.target.value})}} value={course.name} />
+          <FormControl onChange={(e) => {setCourse({...course, description: e.target.value})}} value={course.description} />
+          <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2> <hr />
+        </>
+      )}
       <div id="wd-dashboard-courses">
         <Row xs={1} md={5} className="g-4">
-          {courses.map((course) => (
+          {courses
+            .filter((course) =>
+              enrollments.some(
+                (enrollment) =>
+                  enrollment.user === currentUser._id &&
+                  enrollment.course === course._id
+                ))
+          .map((course) => (
             <Col className="wd-dashboard-course" style={{ width: "300px" }}>
               <Card>
                 <Link to={`/Kambaz/Courses/${course._id}/Home`}
@@ -42,6 +56,15 @@ export default function Dashboard() {
                     <Card.Text className="wd-dashboard-course-description overflow-hidden" style={{ height: "100px" }}>
                       {course.description} </Card.Text>
                     <Button variant="primary"> Go </Button>
+                    {currentUser && currentUser.role === "ADMIN" && (<>
+                    <Button variant="danger" onClick={(e) => {
+                      e.preventDefault(); 
+                      deleteCourse(course._id);}} 
+                      className="float-end"> Delete </Button>
+                    <Button variant="warning" onClick={(e) => {
+                      e.preventDefault(); 
+                      setCourse(course);}}className="float-end me-2"> Edit </Button>  
+                    </>)}  
                   </Card.Body>
                 </Link>
               </Card>

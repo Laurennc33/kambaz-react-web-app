@@ -6,9 +6,8 @@ import Assignments from "./assignments";
 import AssignmentEditor from "./assignments/editor";
 import { GiHamburgerMenu } from "react-icons/gi";
 import PeopleTable from "./people/table";
-import { courses } from "../database";
 
-export default function Courses() {
+export default function Courses({courses}: {courses: any[];}) {
   const { cid } = useParams();
   const course = courses.find((course) => course._id === cid);
   const { pathname } = useLocation();

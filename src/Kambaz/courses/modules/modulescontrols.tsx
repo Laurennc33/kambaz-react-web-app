@@ -1,9 +1,22 @@
-import Button from "react-bootstrap/esm/Button";
-import Dropdown from "react-bootstrap/esm/Dropdown";
+import Button from "react-bootstrap/Button";
+import Dropdown from "react-bootstrap/Dropdown";
 import { FaCheckCircle } from "react-icons/fa";
+import ModuleEditor from "./moduleeditor";
+import { useState } from "react";
 
+export default function ModulesControls ({
+    moduleName, 
+    setModuleName, 
+    addModule, 
+}:{ 
+    moduleName: string; 
+    setModuleName: (title: string) => void; 
+    addModule: () => void; 
+}) {
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
-export default function ModulesControls () {
     return (
         <div>
             <Button variant="secondary me-1">Expand All</Button>
@@ -14,12 +27,19 @@ export default function ModulesControls () {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <Dropdown.Item href="#/action-1"><FaCheckCircle className="text-success me-1"/>Publish All</Dropdown.Item>
-                    <Dropdown.Item href="#/action-1"><FaCheckCircle className="text-success me-1"/>Publish all modulues </Dropdown.Item>
+                    <Dropdown.Item href="#/action-1"><FaCheckCircle className="text-success me-1"/>Publish all modules </Dropdown.Item>
                     <Dropdown.Item href="#/action-1">Publish modules only</Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>
-            <Button variant="danger me-1">+ Module</Button>
-            
+            <Button onClick={handleShow} variant="danger me-1">+ Module</Button>
+            <ModuleEditor 
+            show={show} 
+            handleClose={handleClose} 
+            dialogTitle="Add New Module"
+            moduleName={moduleName} 
+            setModuleName={setModuleName} 
+            addModule={addModule} />
+
         </div>
     );
 }
