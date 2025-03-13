@@ -1,120 +1,228 @@
-import { Form, Row, Col, InputGroup } from 'react-bootstrap';
-import { Link, useParams } from 'react-router';
-import * as db from "../../database";
+import { Modal, Form, Row, Col, Button, FormControl, InputGroup } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
-
-export default function AssignmentEditor() {
-  const { aid } = useParams();
+export default function AssignmentEditor({
+  show,
+  handleClose,
+  dialogTitle,
+  assignmentName,
+  setAssignmentName,
+  addAssignment
+}: {
+  show: boolean;
+  handleClose: () => void;
+  dialogTitle: string;
+  assignmentName: string;
+  setAssignmentName: (name: string) => void;
+  addAssignment: () => void;
+}) {
   const { cid } = useParams();
-  const assignment = db.assignments.find((assignment) => assignment._id === aid);
+
+  const [assignment, setAssignment] = useState({
+    title: '',
+    description: '',
+    points: 0,
+    dueDate: '',
+    availableFrom: '',
+    availableUntil: '',
+    course: cid,
+    group: 'Group 1',
+    displayGradeAs: 'Percentage',
+    submissionType: 'Online',
+    assignTo: 'All Students',
+    onlineEntryOptions: {
+      textEntry: false,
+      websiteURL: false,
+      mediaRecordings: false,
+      studentAnnotation: false,
+      fileUploads: false
+    }
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setAssignment((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setAssignment((prev) => ({
+      ...prev,
+      onlineEntryOptions: {
+        ...prev.onlineEntryOptions,
+        [name]: checked
+      }
+    }));
+  };
+
+  useEffect(() => {
+    if (show && assignmentName) {
+      setAssignment((prev) => ({
+        ...prev,
+        title: assignmentName,
+      }));
+    }
+  }, [show, assignmentName]);
+
   return (
-    <div id="wd-assignments-editor">
-      <Form>
-        <Form.Group controlId="wd-name" className="mb-3">
-          <Form.Label>Assignment Name {aid}</Form.Label>
-          <Form.Control type="text" defaultValue={assignment?.title}/>
-        </Form.Group>
-
-        <Form.Group controlId="wd-description" className="mb-3">
-          <Form.Label>Description {aid} </Form.Label>
-          <Form.Control as="textarea" rows={4} defaultValue={assignment?.description}/>
-        </Form.Group>
-
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="wd-points">
-            <Form.Label>Points</Form.Label>
-            <Form.Control type="number" defaultValue={assignment?.points} />
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>{dialogTitle}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form>
+          <Form.Group controlId="wd-name" className="mb-3">
+            <Form.Label>Assignment Name</Form.Label>
+            <FormControl
+              value={assignment.title}
+              onChange={(e) => {setAssignmentName(e.target.value); handleChange(e)}}
+            />
           </Form.Group>
 
-          <Form.Group as={Col} controlId="wd-group">
-            <Form.Label>Group</Form.Label>
-            <Form.Control as="select" defaultValue="Group 1">
-              <option value="Group 1">Group 1</option>
-              <option value="Group 2">Group 2</option>
-              <option value="Group 3">Group 3</option>
-            </Form.Control>
-          </Form.Group>
-        </Row>
-
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="wd-display-grade-as">
-            <Form.Label>Display Grade As</Form.Label>
-            <Form.Control as="select" defaultValue="Percentage">
-              <option value="Percentage">Percentage</option>
-              <option value="Grade">Grade</option>
-              <option value="Points">Points</option>
-            </Form.Control>
+          <Form.Group controlId="wd-description" className="mb-3">
+            <Form.Label>Description</Form.Label>
+            <FormControl
+              as="textarea"
+              rows={4}
+              name="description"
+              value={assignment.description}
+              onChange={handleChange}
+            />
           </Form.Group>
 
-          <Form.Group as={Col} controlId="wd-submission-type">
-            <Form.Label>Submission Type</Form.Label>
-            <Form.Control as="select" defaultValue="Link">
-              <option value="Link">Online</option>
-              <option value="File Upload">File Upload</option>
-              <option value="Text Entry">Text Entry</option>
-            </Form.Control>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="wd-points">
+              <Form.Label>Points</Form.Label>
+              <FormControl
+                type="number"
+                name="points"
+                value={assignment.points}
+                onChange={handleChange}
+              />
+            </Form.Group>
+
+            <Form.Group as={Col} controlId="wd-group">
+              <Form.Label>Group</Form.Label>
+              <FormControl
+                as="select"
+                name="group"
+                value={assignment.group}
+                onChange={handleChange}
+              >
+                <option value="Group 1">Group 1</option>
+                <option value="Group 2">Group 2</option>
+                <option value="Group 3">Group 3</option>
+              </FormControl>
+            </Form.Group>
+          </Row>
+
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="wd-display-grade-as">
+              <Form.Label>Display Grade As</Form.Label>
+              <FormControl
+                as="select"
+                name="displayGradeAs"
+                value={assignment.displayGradeAs}
+                onChange={handleChange}
+              >
+                <option value="Percentage">Percentage</option>
+                <option value="Grade">Grade</option>
+                <option value="Points">Points</option>
+              </FormControl>
+            </Form.Group>
+
+            <Form.Group as={Col} controlId="wd-submission-type">
+              <Form.Label>Submission Type</Form.Label>
+              <FormControl
+                as="select"
+                name="submissionType"
+                value={assignment.submissionType}
+                onChange={handleChange}
+              >
+                <option value="Online">Online</option>
+                <option value="File Upload">File Upload</option>
+                <option value="Text Entry">Text Entry</option>
+              </FormControl>
+            </Form.Group>
+          </Row>
+
+          <Form.Group className="mb-3" controlId="wd-online-entry-options">
+            <Form.Label>Online Entry Options</Form.Label>
+            <div>
+              {Object.keys(assignment.onlineEntryOptions).map((key) => (
+                <InputGroup key={key}>
+                  <InputGroup.Checkbox
+                    name={key}
+                    checked={assignment.onlineEntryOptions[key as keyof typeof assignment.onlineEntryOptions]}
+                    onChange={handleCheckboxChange}
+                  />
+                  <Form.Label className="ms-2">{key.replace(/([A-Z])/g, ' $1').toUpperCase()}</Form.Label>
+                </InputGroup>
+              ))}
+            </div>
           </Form.Group>
-        </Row>
 
-        <Form.Group className="mb-3" controlId="wd-online-entry-options">
-          <Form.Label>Online Entry Options</Form.Label>
-          <div>
-            <InputGroup>
-              <InputGroup.Checkbox id="wd-chkbox-text-entry" />
-              <Form.Label className="ms-2" htmlFor="wd-chkbox-text-entry">Text Entry</Form.Label>
-            </InputGroup>
-            <InputGroup>
-              <InputGroup.Checkbox id="wd-chkbox-website-url" />
-              <Form.Label className="ms-2" htmlFor="wd-chkbox-website-url">Website URL</Form.Label>
-            </InputGroup>
-            <InputGroup>
-              <InputGroup.Checkbox id="wd-chkbox-media-recordings" />
-              <Form.Label className="ms-2" htmlFor="wd-chkbox-media-recordings">Media Recordings</Form.Label>
-            </InputGroup>
-            <InputGroup>
-              <InputGroup.Checkbox id="wd-chkbox-student-annotation" />
-              <Form.Label className="ms-2" htmlFor="wd-chkbox-student-annotation">Student Annotation</Form.Label>
-            </InputGroup>
-            <InputGroup>
-              <InputGroup.Checkbox id="wd-chkbox-file-uploads" />
-              <Form.Label className="ms-2" htmlFor="wd-chkbox-file-uploads">File Uploads</Form.Label>
-            </InputGroup>
-          </div>
-        </Form.Group>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="wd-assign-to">
+              <Form.Label>Assign To</Form.Label>
+              <FormControl
+                type="text"
+                name="assignTo"
+                value={assignment.assignTo}
+                onChange={handleChange}
+              />
+            </Form.Group>
 
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="wd-assign-to">
-            <Form.Label>Assign To</Form.Label>
-            <Form.Control type="text" defaultValue="All Students" />
-          </Form.Group>
+            <Form.Group as={Col} controlId="wd-due-date">
+              <Form.Label>Due Date</Form.Label>
+              <FormControl
+                type="date"
+                name="dueDate"
+                value={assignment.dueDate}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Row>
 
-          <Form.Group as={Col} controlId="wd-due-date">
-            <Form.Label>Due Date</Form.Label>
-            <Form.Control type="date" />
-          </Form.Group>
-        </Row>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="wd-available-from">
+              <Form.Label>Available From</Form.Label>
+              <FormControl
+                type="date"
+                name="availableFrom"
+                value={assignment.availableFrom}
+                onChange={handleChange}
+              />
+            </Form.Group>
 
-        <Row className="mb-3">
-          <Form.Group as={Col} controlId="wd-available-from">
-            <Form.Label>Available From</Form.Label>
-            <Form.Control type="date" />
-          </Form.Group>
+            <Form.Group as={Col} controlId="wd-available-until">
+              <Form.Label>Available Until</Form.Label>
+              <FormControl
+                type="date"
+                name="availableUntil"
+                value={assignment.availableUntil}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Row>
 
-          <Form.Group as={Col} controlId="wd-available-until">
-            <Form.Label>Available Until</Form.Label>
-            <Form.Control type="date" />
-          </Form.Group>
-        </Row>
-
-        <div className="wd-buttons">
-          <Link to={`/Kambaz/Courses/${cid}/Assignments`} className="btn btn-primary" id="wd-save-button">
-            Save
-          </Link>
-          <Link to={`/Kambaz/Courses/${cid}/Assignments`} className="btn btn-secondary ms-2" id="wd-cancel-button">
-            Cancel
-          </Link>
-        </div>
-      </Form>
-    </div>
+          <Modal.Footer>
+            <Button variant="primary" onClick={() => {
+              addAssignment();
+              handleClose();
+            }}>
+              Save
+            </Button>
+            <Button variant="secondary" onClick={handleClose} className="ms-2">
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal.Body>
+    </Modal>
   );
 }

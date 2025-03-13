@@ -1,6 +1,21 @@
 import Button from "react-bootstrap/esm/Button";
+//import { useNavigate } from "react-router-dom";
+import AssignmentEditor from "./editor";
+import { useState } from "react";
 
-export default function AssignmentControls() {
+export default function AssignmentControls({
+  assignmentName,
+  setAssignmentName,
+  addAssignment,
+}:{
+  assignmentName: string;
+  setAssignmentName: (title:string) => void;
+  addAssignment: () => void;
+}) {
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   return (
     <div>
       <input 
@@ -15,9 +30,17 @@ export default function AssignmentControls() {
       <Button 
         id="wd-add-assignment" 
         variant="danger me-1" 
+        onClick={handleShow}
       >
         + Assignment
       </Button>
+      <AssignmentEditor
+      show={show}
+      handleClose={handleClose}
+      dialogTitle="Add new Assignment"
+      assignmentName={assignmentName}
+      setAssignmentName={setAssignmentName}
+      addAssignment={addAssignment} />
     </div>
   );
 }
