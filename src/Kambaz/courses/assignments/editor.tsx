@@ -1,6 +1,7 @@
-import { Modal, Form, Row, Col, Button, FormControl, InputGroup } from 'react-bootstrap';
+import { Modal, Form, Row, Col, Button, FormControl } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 export default function AssignmentEditor({
   show,
@@ -17,7 +18,7 @@ export default function AssignmentEditor({
   setAssignmentName: (name: string) => void;
   addAssignment: () => void;
 }) {
-  const { cid } = useParams();
+  const { cid, aid } = useParams();
 
   const [assignment, setAssignment] = useState({
     title: '',
@@ -48,16 +49,36 @@ export default function AssignmentEditor({
     }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setAssignment((prev) => ({
-      ...prev,
-      onlineEntryOptions: {
-        ...prev.onlineEntryOptions,
-        [name]: checked
-      }
-    }));
-  };
+
+  const {assignments} = useSelector<any>((state: any) => state.assignmentReducer);
+
+  useEffect(() => {
+    if(aid === 'NEW') {
+      setAssignment({
+        title: '',
+        description: '',
+        points: 0,
+        dueDate: '',
+        availableFrom: '',
+        availableUntil: '',
+        course: cid,
+        group: 'Group 1',
+        displayGradeAs: 'Percentage',
+        submissionType: 'Online',
+        assignTo: 'All Students',
+        onlineEntryOptions: {
+          textEntry: false,
+          websiteURL: false,
+          mediaRecordings: false,
+          studentAnnotation: false,
+          fileUploads: false
+        }
+      })
+    } else {
+      const a = assignments.find((aaa: any) => aaa._id === aid);
+      if(a)      setAssignment(a);
+    }
+  }, [aid]);
 
   useEffect(() => {
     if (show && assignmentName) {
@@ -150,22 +171,6 @@ export default function AssignmentEditor({
             </Form.Group>
           </Row>
 
-          <Form.Group className="mb-3" controlId="wd-online-entry-options">
-            <Form.Label>Online Entry Options</Form.Label>
-            <div>
-              {Object.keys(assignment.onlineEntryOptions).map((key) => (
-                <InputGroup key={key}>
-                  <InputGroup.Checkbox
-                    name={key}
-                    checked={assignment.onlineEntryOptions[key as keyof typeof assignment.onlineEntryOptions]}
-                    onChange={handleCheckboxChange}
-                  />
-                  <Form.Label className="ms-2">{key.replace(/([A-Z])/g, ' $1').toUpperCase()}</Form.Label>
-                </InputGroup>
-              ))}
-            </div>
-          </Form.Group>
-
           <Row className="mb-3">
             <Form.Group as={Col} controlId="wd-assign-to">
               <Form.Label>Assign To</Form.Label>
@@ -217,7 +222,9 @@ export default function AssignmentEditor({
             }}>
               Save
             </Button>
-            <Button variant="secondary" onClick={handleClose} className="ms-2">
+            <Button variant="secondary" onClick={() => {
+              handleClose();
+            }} className="ms-2">
               Cancel
             </Button>
           </Modal.Footer>

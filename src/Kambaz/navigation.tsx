@@ -11,7 +11,7 @@ export default function KambazNavigation() {
   const { pathname } = useLocation();
   const links = [
     { label: "Dashboard", path: "/Kambaz/Dashboard", icon: <AiOutlineDashboard className="fs-1 text-danger" /> },
-    { label: "Courses", path: "/Kambaz/Courses", icon: <FaBook className="fs-1 text-danger" /> },
+    { label: "Courses", path: "/Kambaz/Dashboard", icon: <FaBook className="fs-1 text-danger" /> },
     { label: "Calendar", path: "/Kambaz/Calendar", icon: <IoCalendarOutline className="fs-1 text-danger" /> },
     { label: "Inbox", path: "/Kambaz/Inbox", icon: <FaInbox className="fs-1 text-danger" /> },
     { label: "History", path: "/Kambaz/History", icon: <BiHistory className="fs-1 text-danger" /> },

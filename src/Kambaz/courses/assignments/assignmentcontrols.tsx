@@ -1,7 +1,8 @@
 import Button from "react-bootstrap/esm/Button";
 //import { useNavigate } from "react-router-dom";
 import AssignmentEditor from "./editor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 
 export default function AssignmentControls({
   assignmentName,
@@ -12,9 +13,20 @@ export default function AssignmentControls({
   setAssignmentName: (title:string) => void;
   addAssignment: () => void;
 }) {
+  const {cid, aid} = useParams();
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const navigate = useNavigate();
+  const handleClose = () => {
+    setShow(false);
+    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+  }
+  
+
+  useEffect(() => {
+    if(aid) {
+      setShow(true)
+    }
+  }, [aid])
 
   return (
     <div>
@@ -30,7 +42,7 @@ export default function AssignmentControls({
       <Button 
         id="wd-add-assignment" 
         variant="danger me-1" 
-        onClick={handleShow}
+        onClick={() => navigate(`/Kambaz/Courses/${cid}/Assignments/NEW`) }
       >
         + Assignment
       </Button>

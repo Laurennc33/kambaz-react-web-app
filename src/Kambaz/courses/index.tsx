@@ -3,7 +3,6 @@ import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import Modules from "./modules";
 import Home from "./home";
 import Assignments from "./assignments";
-import AssignmentEditor from "./assignments/editor";
 import { GiHamburgerMenu } from "react-icons/gi";
 import PeopleTable from "./people/table";
 
@@ -26,14 +25,7 @@ export default function Courses({courses}: {courses: any[];}) {
               <Route path="Modules" element={<Modules />} />
               <Route path="Assignments" element={<Assignments /> } />
               <Route path="Assignments/:aid" element={
-                    <AssignmentEditor 
-                      show={true} 
-                      handleClose={() => {}} 
-                      dialogTitle="Edit Assignment" 
-                      assignmentName="" 
-                      setAssignmentName={() => {}} 
-                      addAssignment={() => {}} 
-                    />} />
+                <Assignments />} />
               <Route path="Quizzes" element={<h3>Quizzes</h3>} />
               <Route path="Grades" element={<h3>Grades</h3> } />            
               <Route path="Zoom" element={<h3>Zoom</h3>} />
