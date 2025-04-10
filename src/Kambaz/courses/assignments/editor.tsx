@@ -1,7 +1,8 @@
 import { Modal, Form, Row, Col, Button, FormControl } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { addAssignment as reduxAddAssignment, updateAssignment } from './reducer'; 
 
 export default function AssignmentEditor({
   show,
@@ -9,16 +10,19 @@ export default function AssignmentEditor({
   dialogTitle,
   assignmentName,
   setAssignmentName,
-  addAssignment
+  addAssignment, 
 }: {
   show: boolean;
   handleClose: () => void;
   dialogTitle: string;
   assignmentName: string;
   setAssignmentName: (name: string) => void;
-  addAssignment: () => void;
+  addAssignment: (assignment: any) => void; 
 }) {
   const { cid, aid } = useParams();
+  const dispatch = useDispatch();
+
+  const { assignments } = useSelector((state: any) => state.assignmentReducer);
 
   const [assignment, setAssignment] = useState({
     title: '',
@@ -37,23 +41,20 @@ export default function AssignmentEditor({
       websiteURL: false,
       mediaRecordings: false,
       studentAnnotation: false,
-      fileUploads: false
-    }
+      fileUploads: false,
+    },
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setAssignment((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-
-  const {assignments} = useSelector<any>((state: any) => state.assignmentReducer);
-
   useEffect(() => {
-    if(aid === 'NEW') {
+    if (aid === 'NEW') {
       setAssignment({
         title: '',
         description: '',
@@ -71,14 +72,14 @@ export default function AssignmentEditor({
           websiteURL: false,
           mediaRecordings: false,
           studentAnnotation: false,
-          fileUploads: false
-        }
-      })
+          fileUploads: false,
+        },
+      });
     } else {
       const a = assignments.find((aaa: any) => aaa._id === aid);
-      if(a)      setAssignment(a);
+      if (a) setAssignment(a);
     }
-  }, [aid]);
+  }, [aid, assignments]);
 
   useEffect(() => {
     if (show && assignmentName) {
@@ -88,6 +89,15 @@ export default function AssignmentEditor({
       }));
     }
   }, [show, assignmentName]);
+
+  const handleSave = () => {
+    if (aid === 'NEW') {
+      addAssignment(assignment); 
+    } else {
+      dispatch(updateAssignment(assignment)); 
+    }
+    handleClose(); 
+  };
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -100,7 +110,10 @@ export default function AssignmentEditor({
             <Form.Label>Assignment Name</Form.Label>
             <FormControl
               value={assignment.title}
-              onChange={(e) => {setAssignmentName(e.target.value); handleChange(e)}}
+              onChange={(e) => {
+                setAssignmentName(e.target.value);
+                handleChange(e);
+              }}
             />
           </Form.Group>
 
@@ -216,15 +229,10 @@ export default function AssignmentEditor({
           </Row>
 
           <Modal.Footer>
-            <Button variant="primary" onClick={() => {
-              addAssignment();
-              handleClose();
-            }}>
+            <Button variant="primary" onClick={handleSave}>
               Save
             </Button>
-            <Button variant="secondary" onClick={() => {
-              handleClose();
-            }} className="ms-2">
+            <Button variant="secondary" onClick={handleClose} className="ms-2">
               Cancel
             </Button>
           </Modal.Footer>

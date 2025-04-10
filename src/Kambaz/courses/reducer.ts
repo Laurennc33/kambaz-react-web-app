@@ -1,8 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import * as db from "../database"; 
 
 const initialState = {
-  courses: db.courses,
+  courses: [],
 };
 
 const coursesSlice = createSlice({
@@ -36,9 +35,12 @@ const coursesSlice = createSlice({
         c._id === courseId ? { ...c, editing: true } : c
       ) as any;
     },
+    setCourses: (state, {payload: courses}) => {
+      state.courses = courses;
+    }
   },
 });
 
-export const { addCourse, deleteCourse, updateCourse, editCourse } =
+export const { addCourse, deleteCourse, updateCourse, editCourse, setCourses } =
   coursesSlice.actions;
 export default coursesSlice.reducer;

@@ -1,10 +1,15 @@
 import { Link } from "react-router-dom";
 import { Button, Card, Col, FormControl, Row } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { addEnrollment, deleteEnrollment } from "./courses/enrollment/reducer";
-import React from "react";
+import { addEnrollment, deleteEnrollment, setEnrollments } from "./courses/enrollment/reducer";
+import React, { useEffect } from "react";
+import * as courseClient from "./courses/client";
+import * as enrollmentClient from "./courses/enrollment/client";
+import { setCourses } from "./courses/reducer";
 
-export default function Dashboard({
+
+export default function Dashboard(
+  {
   courses,
   course,
   setCourse,
@@ -13,8 +18,8 @@ export default function Dashboard({
   updateCourse,
   editCourse,
 }: {
-  courses: { _id: string; name: string; description: string }[];
-  course: { _id: string; name: string; description: string };
+  courses: { _id: string; name: string; description: string }[]; 
+  course: { _id: string; name: string; description: string }; 
   setCourse: (course: { _id: string; name: string; description: string }) => void;
   addCourse: (course: { _id: string; name: string; description: string }) => void;
   deleteCourse: (courseId: string) => void;
@@ -25,6 +30,57 @@ export default function Dashboard({
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const { enrollments } = useSelector((state: any) => state.enrollmentReducer);
   const [showAllCourses, setShowAllCourses] = React.useState(false);
+
+  const getAllCourses = async () => {
+    const courses = await courseClient.fetchAllCourses();
+    dispatch(setCourses(courses));
+  }
+  useEffect(() => {
+    getAllCourses();
+  }, []);
+
+
+  const getUserEnrollments = async () => {
+    if (currentUser) {
+      try {
+        const userEnrollments = await enrollmentClient.getUserEnrollments(currentUser._id);
+        dispatch(setEnrollments(userEnrollments));
+      } catch (error) {
+        console.error("Error fetching user enrollments:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getAllCourses();
+    getUserEnrollments();
+  }, [currentUser]);
+
+
+  // Handle user enrollment
+  const handleEnroll = async (courseId: string) => {
+    if (!currentUser) return;
+    try {
+      await enrollmentClient.enrollUserInCourse(currentUser._id, courseId);
+      dispatch(addEnrollment({ user: currentUser._id, course: courseId }));
+      getUserEnrollments(); // Refresh enrollments after action
+    } catch (error) {
+      console.error("Error enrolling in course:", error);
+    }
+  };
+
+  // Handle user unenrollment
+  const handleUnenroll = async (courseId: string) => {
+    if (!currentUser) return;
+    try {
+      await enrollmentClient.unenrollUserFromCourse(currentUser._id, courseId);
+      dispatch(deleteEnrollment({ user: currentUser._id, course: courseId }));
+      getUserEnrollments(); // Refresh enrollments after action
+    } catch (error) {
+      console.error("Error unenrolling from course:", error);
+    }
+  };
+
 
   return (
     <div id="wd-dashboard">
@@ -63,7 +119,6 @@ export default function Dashboard({
         </>
       )}
 
-      {/* Enrollments Toggle Button */}
       <Button
         variant="info"
         onClick={() => setShowAllCourses(!showAllCourses)}
@@ -75,17 +130,6 @@ export default function Dashboard({
       <div id="wd-dashboard-courses">
         <Row xs={1} md={5} className="g-4">
           {courses
-            .filter((course) => {
-              if (showAllCourses) {
-                return true; // Show all courses
-              }
-              // Show only courses user is enrolled in
-              return enrollments.some(
-                (enrollment: { user: string; course: string }) =>
-                  enrollment.user === currentUser._id &&
-                  enrollment.course === course._id
-              );
-            })
             .map((course) => (
               <Col className="wd-dashboard-course" style={{ width: "300px" }} key={course._id}>
                 <Card>
@@ -111,7 +155,6 @@ export default function Dashboard({
                       </Card.Text>
                       <Button variant="primary">Go</Button>
 
-                      {/* Enroll/Unenroll Button */}
                       {enrollments.some(
                         (enrollment: { user: string; course: string; _id: string }) =>
                           enrollment.user === currentUser._id &&
@@ -120,16 +163,7 @@ export default function Dashboard({
                         <Button
                           variant="danger"
                           onClick={() =>
-                            dispatch(
-                              deleteEnrollment(
-                                enrollments.find(
-                                  (enrollment: { user: string; course: string; _id: string }) =>
-                                    enrollment.user === currentUser._id &&
-                                    enrollment.course === course._id
-                                )._id
-                              )
-                            )
-                          }
+                          handleUnenroll(course._id)}
                           className="float-end"
                         >
                           Unenroll
@@ -138,20 +172,14 @@ export default function Dashboard({
                         <Button
                           variant="success"
                           onClick={() =>
-                            dispatch(
-                              addEnrollment({
-                                user: currentUser._id,
-                                course: course._id,
-                              })
-                            )
-                          }
+                            handleEnroll(
+                              course._id)}
                           className="float-end"
                         >
                           Enroll
                         </Button>
                       )}
 
-                      {/* Admin Actions */}
                       {currentUser && currentUser.role === "ADMIN" && (
                         <>
                           <Button

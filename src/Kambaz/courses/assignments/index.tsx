@@ -1,27 +1,72 @@
 import { FormControl, ListGroup } from "react-bootstrap";
-import AssignmentControls from "./assignmentcontrols";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { addAssignment, updateAssignment, deleteAssignment } from "./reducer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AssignmentControls from "./assignmentcontrols";
 import AssignmentControlButtons from "./assignmentcontrolbuttons";
+import * as assignmentsClient from "./client";
+import { addAssignment, updateAssignment, deleteAssignment, setAssignments, editAssignment } from "./reducer";
 
 export default function Assignments() {
-  const { cid } = useParams();
-  const [assignmentName, setAssignmentName] = useState("");
-  const { assignments } = useSelector((state: any) => state.assignmentReducer);
+  const { cid } = useParams(); 
   const dispatch = useDispatch();
+  const { assignments } = useSelector((state: any) => state.assignmentReducer);
+  const [assignmentName, setAssignmentName] = useState(""); 
+
+  const fetchAssignments = async () => {
+    const assignments = await assignmentsClient.findAssignmentsForCourse(cid as string);
+    dispatch(setAssignments(assignments));
+  };
+  useEffect(() => {
+    fetchAssignments();
+  }, [cid]); 
+
+  const handleAddAssignment = async () => {
+    if (!assignmentName || !cid) return;
+    
+    const newAssignment = {
+      title: assignmentName,
+      course: cid,
+      description: "",
+      points: 0,
+      dueDate: "",
+      availableFrom: "",
+      availableUntil: "",
+      group: "Group 1",
+      displayGradeAs: "Percentage",
+      submissionType: "Online",
+      assignTo: "All Students",
+      onlineEntryOptions: {
+        textEntry: false,
+        websiteURL: false,
+        mediaRecordings: false,
+        studentAnnotation: false,
+        fileUploads: false,
+      },
+    };
+
+    const createdAssignment = await assignmentsClient.createAssignment(newAssignment);
+    dispatch(addAssignment(createdAssignment));
+    setAssignmentName(""); 
+  };
+
+  const handleUpdateAssignment = async (updatedAssignment: any) => {
+    const savedAssignment = await assignmentsClient.updateAssignment(updatedAssignment);
+    dispatch(updateAssignment(savedAssignment));
+  };
+
+  const handleDeleteAssignment = async (assignmentId: string) => {
+    await assignmentsClient.deleteAssignment(assignmentId);
+    dispatch(deleteAssignment(assignmentId));
+  };
 
   return (
     <div>
-      <AssignmentControls
-        assignmentName={assignmentName}
-        setAssignmentName={setAssignmentName}
-        addAssignment={() => {
-          dispatch(addAssignment({ title: assignmentName, course: cid }));
-          setAssignmentName("");
-        }}
+      <AssignmentControls 
+        assignmentName={assignmentName} 
+        setAssignmentName={setAssignmentName} 
+        addAssignment={handleAddAssignment} 
       />
       <ListGroup className="rounded-0 mt-5">
         <ListGroup.Item className="wd-module p-0 mb-5 fs-5 border-gray">
@@ -34,26 +79,21 @@ export default function Assignments() {
                     to={`/Kambaz/courses/${cid}/assignments/${assignment._id}`}
                     className="text-white text-decoration-none"
                   >
-                    {!assignment.editing && assignment.title}
-                  </Link>
-                  {assignment.editing && (
-                    <FormControl
-                      className="w-50 d-inline-block"
-                      value={assignment._id}
-                      onChange={(e) =>
-                        dispatch(
-                          updateAssignment({ ...assignment, title: e.target.value })
-                        )
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          dispatch(
-                            updateAssignment({ ...assignment, editing: false })
-                          );
+                    {!assignment.editing ? assignment.title : (
+                      <FormControl
+                        className="w-50 d-inline-block"
+                        value={assignment.title}
+                        onChange={(e) =>
+                          handleUpdateAssignment({ ...assignment, title: e.target.value })
                         }
-                      }}
-                    />
-                  )}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleUpdateAssignment({ ...assignment, editing: false });
+                          }
+                        }}
+                      />
+                    )}
+                  </Link>
                 </div>
                 <div className="assignment-details mt-2">
                   <div className="assignment-description">
@@ -71,9 +111,8 @@ export default function Assignments() {
                 </div>
                 <AssignmentControlButtons
                   assignmentId={assignment._id}
-                  deleteAssignment={(assignmentId) => {
-                    dispatch(deleteAssignment(assignmentId));
-                  }}
+                  deleteAssignment={() => handleDeleteAssignment(assignment._id)} 
+                  editAssignment={() => dispatch(editAssignment(assignment._id))}
                 />
               </ListGroup.Item>
             ))}

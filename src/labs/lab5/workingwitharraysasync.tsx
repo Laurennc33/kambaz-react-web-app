@@ -13,6 +13,9 @@ export default function WorkingWithArraysAsynchronously() {
         const todos = await client.fetchTodos();
         setTodos(todos);
     };
+    useEffect(() => {
+        fetchTodos();
+    }, []);
     const removeTodo = async (todo: any) => {
         const updatedTodos = await client.removeTodo(todo);
         setTodos(updatedTodos);
@@ -32,7 +35,7 @@ export default function WorkingWithArraysAsynchronously() {
             await client.deleteTodo(todo);
             const newTodos = todos.filter((t) => t.id !== todo.id);
             setTodos(newTodos);
-        } catch (error: any) {
+        }   catch (error: any) {
             console.log(error);
             setErrorMessage(error.response.data.message);
         }
@@ -47,16 +50,14 @@ export default function WorkingWithArraysAsynchronously() {
     const [errorMessage, setErrorMessage] = useState(null);
     const updateTodo = async (todo: any) => {
         try {
-        await client.updateTodo(todo);
-        setTodos(todos.map((t) => (t.id === todo.id ? todo : t)));
-        } catch (error: any) {
-        setErrorMessage(error.response.data.message);
+            await client.updateTodo(todo);
+            setTodos(todos.map((t) => (t.id === todo.id ? todo : t)));
+        }   catch (error: any) {
+            setErrorMessage(error.response.data.message);
         }
     };
+
     
-    useEffect(() => {
-        fetchTodos();
-    }, []);
     return (
         <div id="wd-asynchronous-arrays">
         <h3>Working with Arrays Asynchronously</h3>
