@@ -1,5 +1,4 @@
 import Button from "react-bootstrap/esm/Button";
-//import { useNavigate } from "react-router-dom";
 import AssignmentEditor from "./editor";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -7,7 +6,6 @@ import { useNavigate, useParams } from "react-router";
 export default function AssignmentControls({
   assignmentName,
   setAssignmentName,
-  addAssignment,
 }:{
   assignmentName: string;
   setAssignmentName: (title:string) => void;
@@ -52,7 +50,7 @@ export default function AssignmentControls({
       dialogTitle="Add new Assignment"
       assignmentName={assignmentName}
       setAssignmentName={setAssignmentName}
-      addAssignment={addAssignment} />
+       />
     </div>
   );
 }

@@ -29,21 +29,25 @@ export default function Kambaz() {
   };
 
   const updateEnrollment = async (courseId: string, enrolled: boolean) => {
-    if (enrolled) {
-      await userClient.enrollIntoCourse(currentUser._id, courseId);
-    } else {
-      await userClient.unenrollFromCourse(currentUser._id, courseId);
+    try {
+      if (enrolled) {
+        await userClient.enrollIntoCourse(currentUser._id, courseId);
+      } else {
+        await userClient.unenrollFromCourse(currentUser._id, courseId);
+      }
+  
+      setCourses(
+        courses.map((course) =>
+          course._id === courseId ? { ...course, enrolled: enrolled } : course
+        )
+      );
+    } catch (error: any) {
+      const message = error?.response?.data || error?.message || "Unknown error";
+      alert(`Failed to update enrollment: ${message}`);
+      console.error("Enrollment error:", error);
     }
-    setCourses(
-      courses.map((course) => {
-        if (course._id === courseId) {
-          return { ...course, enrolled: enrolled };
-        } else {
-          return course;
-        }
-      })
-    );
   };
+  
  
   const fetchCourses = async () => {
     try {
