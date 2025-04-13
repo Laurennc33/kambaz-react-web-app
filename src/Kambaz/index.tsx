@@ -6,7 +6,7 @@ import Courses from "./courses";
 import "./styles.css";
 import { useDispatch, useSelector } from "react-redux";
 import ProtectedRoute from "./account/protectroute";
-import { editCourse } from "./courses/reducer"; // Action imports
+import { editCourse } from "./courses/reducer"; 
 import { useEffect, useState } from "react";
 import Session from "./account/session";
 import * as courseClient from "./courses/client";
@@ -14,8 +14,8 @@ import * as userClient from "./account/client";
 
 export default function Kambaz() {
   const dispatch = useDispatch();
-  const [courses, setCourses] = useState<any[]>([]);  // State for courses
-  const [course, setCourse] = useState({ _id: "", name: "", description: "" });  // State for a single course
+  const [courses, setCourses] = useState<any[]>([]);  
+  const [course, setCourse] = useState({ _id: "", name: "", description: "" });  
   const { currentUser } = useSelector((state: any) => state.accountReducer);
 
   const [enrolling, setEnrolling] = useState<boolean>(false);

@@ -120,7 +120,6 @@ export default function Dashboard({
                       </Card.Text>
                       <Button variant="primary">Go</Button>
 
-                      {/* ✅ New Enrolling Button */}
                       {enrolling && (
                         <button
                           className={`btn ${isEnrolled ? "btn-danger" : "btn-success"} float-end`}

@@ -2,7 +2,11 @@ import { Modal, Form, Row, Col, Button, FormControl } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addAssignment as updateAssignment } from './reducer'; 
+import * as assignmentsClient from './client';
+import {
+  addAssignment as addAssignmentReducer,
+  updateAssignment as updateAssignmentReducer,
+} from './reducer';
 
 export default function AssignmentEditor({
   show,
@@ -10,18 +14,15 @@ export default function AssignmentEditor({
   dialogTitle,
   assignmentName,
   setAssignmentName,
-  addAssignment, 
 }: {
   show: boolean;
   handleClose: () => void;
   dialogTitle: string;
   assignmentName: string;
   setAssignmentName: (name: string) => void;
-  addAssignment: (assignment: any) => void; 
 }) {
   const { cid, aid } = useParams();
   const dispatch = useDispatch();
-
   const { assignments } = useSelector((state: any) => state.assignmentReducer);
 
   const [assignment, setAssignment] = useState({
@@ -90,13 +91,15 @@ export default function AssignmentEditor({
     }
   }, [show, assignmentName]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (aid === 'NEW') {
-      addAssignment(assignment); 
+      const newAssignment = await assignmentsClient.createAssignment(assignment);
+      dispatch(addAssignmentReducer(newAssignment)); // Update Redux store
     } else {
-      dispatch(updateAssignment(assignment)); 
+      const updatedAssignment = await assignmentsClient.updateAssignment(assignment);
+      dispatch(updateAssignmentReducer(updatedAssignment)); // Update Redux store
     }
-    handleClose(); 
+    handleClose();
   };
 
   return (
