@@ -2,7 +2,7 @@ import { Modal, Form, Row, Col, Button, FormControl } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addAssignment as reduxAddAssignment, updateAssignment } from './reducer'; 
+import { addAssignment as updateAssignment } from './reducer'; 
 
 export default function AssignmentEditor({
   show,
