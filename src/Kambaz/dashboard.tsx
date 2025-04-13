@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { Button, Card, Col, FormControl, Row } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { setEnrollments } from "./courses/enrollment/reducer";
+//import { setEnrollments } from "./courses/enrollment/reducer";
 import React, { useEffect } from "react";
 import * as courseClient from "./courses/client";
-import * as enrollmentClient from "./courses/enrollment/client";
+//import * as enrollmentClient from "./courses/enrollment/client";
 import { setCourses } from "./courses/reducer";
 
 export default function Dashboard({
@@ -43,44 +43,6 @@ export default function Dashboard({
   useEffect(() => {
     getAllCourses();
   }, []);
-
-  const getUserEnrollments = async () => {
-    if (currentUser) {
-      try {
-        const userEnrollments = await enrollmentClient.getUserEnrollments(currentUser._id);
-        dispatch(setEnrollments(userEnrollments));
-      } catch (error) {
-        console.error("Error fetching user enrollments:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    getAllCourses();
-    getUserEnrollments();
-  }, [currentUser]);
-
-  //const handleEnroll = async (courseId: string) => {
-    //if (!currentUser) return;
-    //try {
-      //await enrollmentClient.enrollUserInCourse(currentUser._id, courseId);
-      //dispatch(addEnrollment({ user: currentUser._id, course: courseId }));
-      //getUserEnrollments();
-    //} catch (error) {
-      //console.error("Error enrolling in course:", error);
-    //}
-  //};
-
-  //const handleUnenroll = async (courseId: string) => {
-    //if (!currentUser) return;
-    //try {
-      //await enrollmentClient.unenrollUserFromCourse(currentUser._id, courseId);
-      //dispatch(deleteEnrollment({ user: currentUser._id, course: courseId }));
-      //getUserEnrollments();
-    //} catch (error) {
-      //console.error("Error unenrolling from course:", error);
-    //}
-  //};
 
   return (
     <div id="wd-dashboard">

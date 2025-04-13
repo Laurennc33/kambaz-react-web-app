@@ -70,17 +70,7 @@ export default function Kambaz() {
       findCoursesForUser();
     }
   }, [currentUser, enrolling]);
-
-  //const fetchCourses = async () => {
-    //try {
-      //const courses = await courseClient.fetchAllCourses();
-      //setCourses(courses);
-    //} catch (error) {
-      //console.error(error);
-    //}
-  //};
   
-
   const addCourse = async () => {
     const newCourse = await courseClient.createCourse(course);
     setCourses([ ...courses, newCourse ]);
