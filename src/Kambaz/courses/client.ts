@@ -37,7 +37,7 @@ export const deleteCourse = async (id: string) => {
 };
 
 export const updateCourse = async (course: any) => {
-  console.log("Updating course with ID:", course._id); // Debugging line
+  console.log("Updating course with ID:", course._id); 
   const { data } = await axiosWithCredentials.put(`${COURSES_API}/${course._id}`, course);
   return data;
 };

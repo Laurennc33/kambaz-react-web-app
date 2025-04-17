@@ -5,6 +5,12 @@ const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 const ENROLLMENTS_API = `${REMOTE_SERVER}/api/enrollments`;
 
 
+export const fetchEnrollments = async (userId: string) => {
+    const response = await axiosWithCredentials.get(`${ENROLLMENTS_API}/${userId}`);
+    return response.data;
+};
+    
+
 export const enrollUserInCourse = async (userId: string, courseId: string) => {
     const response = await axiosWithCredentials.post(`${ENROLLMENTS_API}/enroll`, { userId, courseId });
     console.log("Error")
