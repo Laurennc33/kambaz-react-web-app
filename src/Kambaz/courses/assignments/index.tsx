@@ -13,7 +13,7 @@ export default function Assignments() {
   const dispatch = useDispatch();
   const { assignments } = useSelector((state: any) => state.assignmentReducer);
   const [assignmentName, setAssignmentName] = useState(""); 
-
+  
   const fetchAssignments = async () => {
     const assignments = await assignmentsClient.findAssignmentsForCourse(cid as string);
     dispatch(setAssignments(assignments));

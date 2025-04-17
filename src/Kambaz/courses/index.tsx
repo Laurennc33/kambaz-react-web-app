@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import Modules from "./modules";
 import Home from "./home";
 import Assignments from "./assignments";
+import Quizzes from "./quizzes";
 import { GiHamburgerMenu } from "react-icons/gi";
 import PeopleTable from "./people/table";
 
@@ -24,9 +25,9 @@ export default function Courses({courses}: {courses: any[];}) {
               <Route path="Home" element={<Home />} />
               <Route path="Modules" element={<Modules />} />
               <Route path="Assignments" element={<Assignments /> } />
-              <Route path="Assignments/:aid" element={
-                <Assignments />} />
-              <Route path="Quizzes" element={<h3>Quizzes</h3>} />
+              <Route path="Assignments/:aid" element={<Assignments />} />
+              <Route path="Quizzes" element={<Quizzes />} />
+              <Route path="Quizzes/:qid" element={<Assignments />} />
               <Route path="Grades" element={<h3>Grades</h3> } />            
               <Route path="Zoom" element={<h3>Zoom</h3>} />
               <Route path="Piazza" element={<h3>Piazza</h3> } />
