@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Card, Col, FormControl, Row } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import * as courseClient from "./courses/client";
 import { setCourses } from "./courses/reducer";
 import { fetchEnrollments } from "./courses/enrollment/client";

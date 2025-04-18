@@ -30,7 +30,6 @@ export default function QuizControlButtons({
         className="fs-4"
         title="More Options"
         style={{ cursor: "pointer" }}
-        // You can later expand this to show a dropdown
       />
     </div>
   );

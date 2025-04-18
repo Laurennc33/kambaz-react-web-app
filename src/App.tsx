@@ -3,6 +3,8 @@ import Labs from "./labs";
 import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
 import store from "./Kambaz/store";
 import { Provider } from "react-redux";
+import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+
 
 export default function App() {
   return (

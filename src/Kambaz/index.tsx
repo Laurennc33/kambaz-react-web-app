@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 import Session from "./account/session";
 import * as courseClient from "./courses/client";
 import * as userClient from "./account/client";
+import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+
 
 export default function Kambaz() {
   const dispatch = useDispatch();
