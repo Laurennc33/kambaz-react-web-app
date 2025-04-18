@@ -4,15 +4,14 @@ import Modules from "./modules";
 import Home from "./home";
 import Assignments from "./assignments";
 import Quizzes from "./quizzes";
-import QuizDetails from "./quizzes/details"; 
-import QuizEditor from "./quizzes/editor"; 
-import QuizQuestionsEditor from "./quizzes/quizquestioneditor"; 
+import QuizDetails from "./quizzes/details";
+import QuizEditor from "./quizzes/editor";
+import QuizQuestionsEditor from "./quizzes/quizquestioneditor";
 import { GiHamburgerMenu } from "react-icons/gi";
 import PeopleTable from "./people/table";
 import QuizPreview from "./quizzes/previewscreen";
-
-// 🧠 Import the context provider
-import { QuizProvider } from "./contexts/QuizContext";
+import { QuizProvider } from "../courses/quizzes/quizcontext";
+import StudentQuizView from "./quizzes/studentquizview";
 
 export default function Courses({ courses }: { courses: any[] }) {
   const { cid } = useParams();
@@ -50,7 +49,9 @@ export default function Courses({ courses }: { courses: any[] }) {
                     <Route path=":qid" element={<QuizDetails />} />
                     <Route path=":qid/Edit" element={<QuizEditor />} />
                     <Route path=":qid/Questions" element={<QuizQuestionsEditor />} />
+                    <Route path=":qid/StudentView" element={<StudentQuizView />} />
                     <Route path=":qid/Preview" element={<QuizPreview />} />
+
                   </Routes>
                 </QuizProvider>
               }

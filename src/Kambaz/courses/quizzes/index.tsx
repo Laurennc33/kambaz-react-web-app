@@ -18,7 +18,6 @@ import {
     addQuiz,
     deleteQuiz,
     setQuizzes,
-    togglePublishQuiz,
     updateQuiz,
     editQuiz,
 } from "./reducer";
@@ -29,6 +28,8 @@ export default function Quizzes() {
     const { quizzes } = useSelector((state: any) => state.quizzesReducer);
     const [quizName, setQuizName] = useState("");
     const [creatingQuiz, setCreatingQuiz] = useState(false);
+    const { currentUser } = useSelector((state: any) => state.accountReducer);
+    console.log(currentUser);
 
     useEffect(() => {
         const fetchQuizzes = async () => {
@@ -78,17 +79,6 @@ export default function Quizzes() {
         }
     };
 
-    const handleTogglePublish = async (quiz: any) => {
-        const updatedQuiz = { ...quiz, published: !quiz.published };
-        try {
-            await quizzesClient.updateQuiz(updatedQuiz);
-            dispatch(togglePublishQuiz(quiz._id));
-        } catch (error) {
-            console.error("Error updating quiz publish status:", error);
-            alert("Error updating publish status. Please try again later.");
-        }
-    };
-
     const handleEditQuiz = (quizId: string) => {
         // Dispatch editQuiz to mark the quiz as being edited
         dispatch(editQuiz(quizId)); // This sets `editing: true` for the quiz
@@ -130,23 +120,28 @@ export default function Quizzes() {
                     value={quizName}
                     onChange={(e) => setQuizName(e.target.value)}
                 />
-                <Button
-                    variant="danger"
-                    size="lg"
-                    className="me-1 d-flex align-items-center gap-1"
-                    onClick={handleAddQuiz}
-                    disabled={creatingQuiz}
-                >
-                    {creatingQuiz ? <Spinner animation="border" size="sm" /> : <FaPlus />}
-                    Quiz
-                </Button>
-                <Button
-                    variant="btn btn-secondary btn-lg"
-                    size="lg"
-                    className="me-1 d-flex align-items-center"
-                >
-                    <IoEllipsisVertical className="fs-3" />
-                </Button>
+                {(currentUser.role === "ADMIN" || currentUser.role === "FACULTY") && (
+                    <div>
+                        <Button
+                            variant="danger"
+                            size="lg"
+                            className="me-1 d-flex align-items-center gap-1"
+                            onClick={handleAddQuiz}
+                            disabled={creatingQuiz}
+                        >
+                            {creatingQuiz ? <Spinner animation="border" size="sm" /> : <FaPlus />}
+                            Quiz
+                        </Button>
+                        <Button
+                            variant="btn btn-secondary btn-lg"
+                            size="lg"
+                            className="me-1 d-flex align-items-center"
+                        >
+                            <IoEllipsisVertical className="fs-3" />
+                        </Button>
+                    </div>
+                )}
+
             </div>
 
             <hr />
@@ -175,18 +170,31 @@ export default function Quizzes() {
 
                             {/* Right content */}
                             <div className="flex-grow-1">
+                                {(currentUser.role === "ADMIN" || currentUser.role === "FACULTY") && (
                                 <Link
                                     className="wd-assignment-link text-black link-underline link-underline-opacity-0"
                                     to={`/Kambaz/courses/${cid}/quizzes/${quiz._id}`}
                                 >
                                     <b>{quiz.title || "Untitled Quiz"}</b>
                                 </Link>
+                                )}
+
+                                 {currentUser.role === "STUDENT" && (
+                                <Link
+                                    className="wd-assignment-link text-black link-underline link-underline-opacity-0"
+                                    to={`/Kambaz/courses/${cid}/quizzes/${quiz._id}/StudentView`}
+                                >
+                                    <b>{quiz.title || "Untitled Quiz"}</b>
+                                </Link>
+                                )}
+
                                 <p className="mb-1">
                                     {getAvailabilityStatus(quiz)} | <b>Due:</b> {quiz.dueDate || "N/A"} |{" "}
                                     {quiz.points || 0} pts | {quiz.questions?.length || 0} Questions
                                 </p>
 
                                 {/* Dropdown and publish status */}
+                                {(currentUser.role === "ADMIN" || currentUser.role === "FACULTY") && (
                                 <div className="d-flex align-items-center gap-3">
                                     <DropdownButton
                                         id="dropdown-basic-button"
@@ -195,9 +203,6 @@ export default function Quizzes() {
                                         className="mt-1"
                                         variant="light"
                                     >
-                                        <Dropdown.Item onClick={() => handleTogglePublish(quiz)}>
-                                            {quiz.published ? "Unpublish" : "Publish"}
-                                        </Dropdown.Item>
 
                                         <Dropdown.Item
                                             as={Link}
@@ -217,9 +222,10 @@ export default function Quizzes() {
                                             Delete
                                         </Dropdown.Item>
                                     </DropdownButton>
-
+                                   
                                     {quiz.published && <BsCheckCircleFill className="fs-4 text-success" />}
                                 </div>
+                                )}
                             </div>
                         </li>
                     ))}

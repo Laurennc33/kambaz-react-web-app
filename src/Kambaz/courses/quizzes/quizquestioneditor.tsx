@@ -2,53 +2,83 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form, Dropdown, DropdownButton, Table } from 'react-bootstrap';
 import { FaTrashAlt } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuiz } from './quizcontext'; // ✅ Import your context
+import { useQuiz, Question } from './quizcontext';
+import { updateQuizQuestions } from './client'; // <-- Adjust path if needed
 
 export default function QuizQuestionsEditor() {
-  const { questions, setQuestions } = useQuiz(); // ✅ Use context
-  const [newQuestion, setNewQuestion] = useState({
+  const { questions, setQuestions } = useQuiz();
+  const [newQuestion, setNewQuestion] = useState<Question>({
     id: '',
     type: 'multiple_choice',
     question: '',
     points: 1,
     options: ['', '', '', ''],
     correctAnswer: '',
-    fillInTheBlankAnswers: [''],
+    fillInTheBlankAnswers: [{ text: '', isCorrect: true }],
   });
+
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [points, setPoints] = useState<number>(0);
-
   const navigate = useNavigate();
-  const { cid, qid } = useParams(); // Get IDs from route
+  const { cid, qid } = useParams();
 
   useEffect(() => {
     calculateTotalPoints();
   }, [questions]);
+
+  useEffect(() => {
+    if (!qid) {
+      console.error("Quiz ID (qid) is missing!");
+      navigate('/path-to-some-other-page'); // Redirect if no qid
+    }
+  }, [qid, navigate]);
 
   const calculateTotalPoints = () => {
     const total = questions.reduce((acc, curr) => acc + curr.points, 0);
     setPoints(total);
   };
 
-  const handleAddQuestion = () => {
-    const newQ = { ...newQuestion, id: `${Date.now()}` };
-    setQuestions((prev) => [...prev, newQ]);
-    resetNewQuestion();
-  };
-
-  const handleEditQuestion = (id: string) => {
-    const q = questions.find((q) => q.id === id);
-    if (q) {
-      setEditingQuestionId(id);
-      setNewQuestion({ ...q });
+  const syncQuestionsWithServer = async (updatedQuestions: Question[]) => {
+    if (!qid) return;
+    try {
+      await updateQuizQuestions(qid, updatedQuestions);
+    } catch (err) {
+      console.error("Failed to sync questions with server:", err);
     }
   };
 
-  const handleSaveEdit = () => {
+  const handleAddQuestion = async () => {
+    if (qid) {
+      const newQ: Question = { ...newQuestion, id: `${Date.now()}` }; // Ensure `id` is assigned
+      const updated: Question[] = [...questions, newQ];
+      setQuestions(updated); // Update local state with new question
+      resetNewQuestion(); // Reset form for new question
+
+      try {
+        await syncQuestionsWithServer(updated); // Sync with server after local state update
+      } catch (err) {
+        console.error("Failed to sync questions to server:", err);
+      }
+    } else {
+      console.error("Quiz ID (qid) is undefined. Cannot save question.");
+    }
+  };
+
+  const handleEditQuestion = (questionId: string) => {
+    const questionToEdit = questions.find((q) => q.id === questionId);
+    if (questionToEdit) {
+      setEditingQuestionId(questionId);
+      setNewQuestion({ ...questionToEdit });
+    }
+  };
+
+  const handleSaveEdit = async () => {
     if (editingQuestionId) {
-      setQuestions((prev) =>
-        prev.map((q) => (q.id === editingQuestionId ? { ...newQuestion } : q))
+      const updated = questions.map((q) =>
+        q.id === editingQuestionId ? { ...newQuestion } : q
       );
+      setQuestions(updated);
+      await syncQuestionsWithServer(updated);
       resetNewQuestion();
     }
   };
@@ -57,8 +87,10 @@ export default function QuizQuestionsEditor() {
     resetNewQuestion();
   };
 
-  const handleDeleteQuestion = (id: string) => {
-    setQuestions((prev) => prev.filter((q) => q.id !== id));
+  const handleDeleteQuestion = async (id: string) => {
+    const updated = questions.filter((q) => q.id !== id);
+    setQuestions(updated);
+    await syncQuestionsWithServer(updated);
   };
 
   const resetNewQuestion = () => {
@@ -70,7 +102,7 @@ export default function QuizQuestionsEditor() {
       points: 1,
       options: ['', '', '', ''],
       correctAnswer: '',
-      fillInTheBlankAnswers: [''],
+      fillInTheBlankAnswers: [{ text: '', isCorrect: true }],
     });
   };
 
@@ -91,9 +123,18 @@ export default function QuizQuestionsEditor() {
     }));
   };
 
-  const handleChangeFillInTheBlankAnswer = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleChangeFillInTheBlankAnswerText = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const updated = [...newQuestion.fillInTheBlankAnswers];
-    updated[index] = e.target.value.trim().toLowerCase();
+    updated[index].text = e.target.value;
+    setNewQuestion((prev) => ({
+      ...prev,
+      fillInTheBlankAnswers: updated,
+    }));
+  };
+
+  const toggleFillInTheBlankCorrect = (index: number) => {
+    const updated = [...newQuestion.fillInTheBlankAnswers];
+    updated[index].isCorrect = !updated[index].isCorrect;
     setNewQuestion((prev) => ({
       ...prev,
       fillInTheBlankAnswers: updated,
@@ -103,14 +144,16 @@ export default function QuizQuestionsEditor() {
   const addFillInTheBlankAnswer = () => {
     setNewQuestion((prev) => ({
       ...prev,
-      fillInTheBlankAnswers: [...prev.fillInTheBlankAnswers, ''],
+      fillInTheBlankAnswers: [...prev.fillInTheBlankAnswers, { text: '', isCorrect: false }],
     }));
   };
 
   const removeFillInTheBlankAnswer = (index: number) => {
+    const updated = [...newQuestion.fillInTheBlankAnswers];
+    updated.splice(index, 1);
     setNewQuestion((prev) => ({
       ...prev,
-      fillInTheBlankAnswers: prev.fillInTheBlankAnswers.filter((_, i) => i !== index),
+      fillInTheBlankAnswers: updated,
     }));
   };
 
@@ -123,6 +166,19 @@ export default function QuizQuestionsEditor() {
 
   const handleBackToQuiz = () => {
     navigate(`/Kambaz/courses/${cid}/quizzes/${qid}`);
+  };
+
+  const handleSaveAllQuestions = async () => {
+    if (qid) {
+      try {
+        await syncQuestionsWithServer(questions); // Save all the questions
+        console.log('All questions saved!');
+      } catch (err) {
+        console.error('Error saving all questions:', err);
+      }
+    } else {
+      console.error("Quiz ID (qid) is missing. Cannot save questions.");
+    }
   };
 
   return (
@@ -160,6 +216,11 @@ export default function QuizQuestionsEditor() {
         </tbody>
       </Table>
 
+      <div className="d-flex justify-content-between mt-3">
+        <Button variant="primary" onClick={handleBackToQuiz}>Back to Quiz Details</Button>
+        <Button variant="primary" onClick={handleSaveAllQuestions}>Save All Questions</Button>
+      </div>
+
       {(editingQuestionId || newQuestion.question) && (
         <div>
           <h3>{editingQuestionId ? 'Edit Question' : 'New Question'}</h3>
@@ -196,16 +257,23 @@ export default function QuizQuestionsEditor() {
 
             {newQuestion.type === 'multiple_choice' && (
               <>
-                <Form.Label>Options</Form.Label>
+                <Form.Label>Options (Select correct answer)</Form.Label>
                 {newQuestion.options.map((option, idx) => (
-                  <Form.Control
-                    key={idx}
-                    type="text"
-                    placeholder={`Option ${idx + 1}`}
-                    value={option}
-                    onChange={(e) => handleChangeOptions(e, idx)}
-                    className="mb-2"
-                  />
+                  <div key={idx} className="d-flex align-items-center mb-2">
+                    <Form.Check
+                      type="radio"
+                      name="correctOption"
+                      checked={newQuestion.correctAnswer === option}
+                      onChange={() => handleCorrectAnswerChange(option)}
+                      className="me-2"
+                    />
+                    <Form.Control
+                      type="text"
+                      placeholder={`Option ${idx + 1}`}
+                      value={option}
+                      onChange={(e) => handleChangeOptions(e, idx)}
+                    />
+                  </div>
                 ))}
               </>
             )}
@@ -232,38 +300,42 @@ export default function QuizQuestionsEditor() {
 
             {newQuestion.type === 'fill_in_blank' && (
               <>
-                <Form.Label>Correct Answers (Case Insensitive)</Form.Label>
-                {newQuestion.fillInTheBlankAnswers.map((answer, index) => (
-                  <div key={index} className="d-flex align-items-center mb-2">
+                <Form.Label>Answers (Fill in the blank)</Form.Label>
+                {newQuestion.fillInTheBlankAnswers.map((answer, idx) => (
+                  <div key={idx} className="d-flex align-items-center mb-2">
                     <Form.Control
                       type="text"
-                      value={answer}
-                      onChange={(e) => handleChangeFillInTheBlankAnswer(e, index)}
+                      placeholder={`Answer ${idx + 1}`}
+                      value={answer.text}
+                      onChange={(e) => handleChangeFillInTheBlankAnswerText(e, idx)}
                     />
-                    <Button variant="danger" size="sm" className="ms-2" onClick={() => removeFillInTheBlankAnswer(index)}>
-                      <FaTrashAlt />
-                    </Button>
+                    <Form.Check
+                      type="checkbox"
+                      label="Correct"
+                      checked={answer.isCorrect}
+                      onChange={() => toggleFillInTheBlankCorrect(idx)}
+                      className="ms-2"
+                    />
+                    <Button variant="danger" onClick={() => removeFillInTheBlankAnswer(idx)}><FaTrashAlt /></Button>
                   </div>
                 ))}
-                <Button variant="primary" size="sm" onClick={addFillInTheBlankAnswer}>
-                  Add Answer
-                </Button>
+                <Button onClick={addFillInTheBlankAnswer}>Add Answer</Button>
               </>
             )}
 
-            <div className="d-flex justify-content-end gap-2 mt-3">
-              <Button variant="secondary" onClick={handleCancelEdit}>Cancel</Button>
-              <Button variant="primary" onClick={handleSaveEdit}>Save</Button>
+            <div className="d-flex justify-content-end mt-4">
+              {editingQuestionId ? (
+                <Button variant="primary" onClick={handleSaveEdit}>Save Changes</Button>
+              ) : (
+                <Button variant="success" onClick={handleAddQuestion}>Add Question</Button>
+              )}
+              {editingQuestionId && (
+                <Button variant="warning" onClick={handleCancelEdit}>Cancel Edit</Button>
+              )}
             </div>
           </Form>
         </div>
       )}
-
-      <div className="mt-4">
-        <Button variant="secondary" onClick={handleBackToQuiz}>
-          Back to Quiz
-        </Button>
-      </div>
     </div>
   );
 }

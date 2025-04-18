@@ -31,3 +31,40 @@ export const deleteQuiz = async (quizId: string) => {
   const response = await axiosWithCredentials.delete(`${QUIZZES_API}/${quizId}`);
   return response.data;
 };
+
+export const updateQuizQuestions = async (quizId: string, questions: any[]) => {
+  const { data } = await axiosWithCredentials.patch(
+    `${QUIZZES_API}/${quizId}/questions`,
+    { questions }
+  );
+  return data;
+};
+
+// ✅ Make it its own clean function
+export const syncQuestionsWithServer = async (quizId: string, questions: any[]) => {
+  return updateQuizQuestions(quizId, questions);
+};
+
+export const addQuestionToQuiz = async (quizId: string, question: any) => {
+  const { data } = await axiosWithCredentials.post(`${QUIZZES_API}/${quizId}/questions`, question);
+  return data;
+};
+
+export const updateQuestionInQuiz = async (
+  quizId: string,
+  questionId: string,
+  updatedQuestion: any
+) => {
+  const { data } = await axiosWithCredentials.put(
+    `${QUIZZES_API}/${quizId}/questions/${questionId}`,
+    updatedQuestion
+  );
+  return data;
+};
+
+export const deleteQuestionFromQuiz = async (quizId: string, questionId: string) => {
+  const { data } = await axiosWithCredentials.delete(
+    `${QUIZZES_API}/${quizId}/questions/${questionId}`
+  );
+  return data;
+};

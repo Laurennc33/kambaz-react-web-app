@@ -1,60 +1,127 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+export interface Question {
+    _id: string;
+    type: string;
+    question: string;
+    points: number;
+    options: string[];
+    correctAnswer: string;
+    fillInTheBlankAnswers: { text: string; isCorrect: boolean }[];
+}
+
+export interface Quiz {
+    _id: string;
+    course: string;
+    title: string;
+    description: string;
+    type: "Graded Quiz" | "Practice Quiz" | "Exam";
+    assignmentGroup: "Assignments" | "Quizzes" | "Exams";
+    shuffleAnswers: boolean;
+    timeLimit: number;
+    multipleAttempts: boolean;
+    showCorrectAnswers: boolean;
+    accessCode: string;
+    oneQuestionAtATime: boolean;
+    webcamRequired: boolean;
+    lockQuestionsAfterAnswering: boolean;
+    dueDate: string | null;
+    availableDate: string | null;
+    untilDate: string | null;
+    questions: Question[];
+    points: number;
+    editing?: boolean;
+}
 
 const initialState = {
-  quizzes: [],
+    quizzes: [] as Quiz[],
 };
 
 const quizzesSlice = createSlice({
-  name: "quizzes",
-  initialState,
-  reducers: {
-    setQuizzes: (state, { payload: quizzes }) => {
-      state.quizzes = quizzes;
+    name: "quizzes",
+    initialState,
+    reducers: {
+        setQuizzes: (state, { payload }: PayloadAction<Quiz[]>) => {
+            state.quizzes = payload;
+        },
+        addQuiz: (state, { payload }: PayloadAction<Quiz>) => {
+            state.quizzes.push(payload);
+        },
+        deleteQuiz: (state, { payload }: PayloadAction<string>) => {
+            state.quizzes = state.quizzes.filter((q) => q._id !== payload);
+        },
+        updateQuiz: (state, { payload }: PayloadAction<Quiz>) => {
+            state.quizzes = state.quizzes.map((q) =>
+                q._id === payload._id ? payload : q
+            );
+        },
+        addQuestionToQuiz: (
+            state,
+            { payload }: PayloadAction<{ quizId: string; question: Question }>
+        ) => {
+            console.log('Adding question:', payload); // Log to verify payload
+            state.quizzes = state.quizzes.map((quiz) =>
+                quiz._id === payload.quizId
+                    ? { ...quiz, questions: [...quiz.questions, payload.question] }
+                    : quiz
+            );
+        },
+
+        updateQuestionInQuiz: (
+            state,
+            {
+                payload,
+            }: PayloadAction<{
+                quizId: string;
+                questionId: string;
+                updatedQuestion: Question;
+            }>
+        ) => {
+            state.quizzes = state.quizzes.map((quiz) =>
+                quiz._id === payload.quizId
+                    ? {
+                        ...quiz,
+                        questions: quiz.questions.map((q) =>
+                            q._id === payload.questionId ? payload.updatedQuestion : q
+                        ),
+                    }
+                    : quiz
+            );
+        },
+        deleteQuestionFromQuiz: (
+            state,
+            {
+                payload,
+            }: PayloadAction<{ quizId: string; questionId: string }>
+        ) => {
+            state.quizzes = state.quizzes.map((quiz) =>
+                quiz._id === payload.quizId
+                    ? {
+                        ...quiz,
+                        questions: quiz.questions.filter(
+                            (q) => q._id !== payload.questionId
+                        ),
+                    }
+                    : quiz
+            );
+        },
+        editQuiz: (state, { payload }: PayloadAction<string>) => {
+            state.quizzes = state.quizzes.map((quiz) =>
+                quiz._id === payload ? { ...quiz, editing: true } : quiz
+            );
+        },
     },
-    addQuiz: (state, { payload: quiz }) => {
-      const newQuiz: any = {
-        _id: new Date().getTime().toString(),
-        title: quiz.title,
-        description: quiz.description || "",
-        points: quiz.points || 0,
-        dueDate: quiz.dueDate || "",
-        availableFrom: quiz.availableFrom || "",
-        availableUntil: quiz.availableUntil || "",
-        course: quiz.course,
-        published: false,
-        numberOfQuestions: quiz.numberOfQuestions || 0,
-        score: quiz.score || null,
-      };
-      state.quizzes = [...state.quizzes, newQuiz] as any;
-    },
-    deleteQuiz: (state, { payload: quizId }) => {
-      state.quizzes = state.quizzes.filter((q: any) => q._id !== quizId);
-    },
-    updateQuiz: (state, { payload: quiz }) => {
-      state.quizzes = state.quizzes.map((q: any) =>
-        q._id === quiz._id ? quiz : q
-      ) as any;
-    },
-    editQuiz: (state, { payload: quizId }) => {
-      state.quizzes = state.quizzes.map((q: any) =>
-        q._id === quizId ? { ...q, editing: true } : q
-      ) as any;
-    },
-    togglePublishQuiz: (state, { payload: quizId }) => {
-      state.quizzes = state.quizzes.map((q: any) =>
-        q._id === quizId ? { ...q, published: !q.published } : q
-      ) as any;
-    },
-  },
 });
 
 export const {
-  setQuizzes,
-  addQuiz,
-  deleteQuiz,
-  updateQuiz,
-  editQuiz,
-  togglePublishQuiz,
+    setQuizzes,
+    addQuiz,
+    deleteQuiz,
+    updateQuiz,
+    addQuestionToQuiz,
+    updateQuestionInQuiz,
+    deleteQuestionFromQuiz,
+    editQuiz,
 } = quizzesSlice.actions;
 
 export default quizzesSlice.reducer;
