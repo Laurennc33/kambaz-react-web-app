@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+export type QuestionType = "multiple_choice" | "fill_in_the_blank" | "true_false";
+
 export interface Question {
     _id: string;
-    type: string;
+    type: QuestionType;
     question: string;
     points: number;
-    options: string[];
-    correctAnswer: string;
-    fillInTheBlankAnswers: { text: string; isCorrect: boolean }[];
+    options?: string[]; // only for multiple_choice
+    correctAnswer?: string;
 }
 
 export interface Quiz {
@@ -33,94 +34,109 @@ export interface Quiz {
     editing?: boolean;
 }
 
-const initialState = {
-    quizzes: [] as Quiz[],
+interface QuizzesState {
+    quizzes: Quiz[];
+    studentAttempts: any[];
+}
+
+const initialState: QuizzesState = {
+    quizzes: [],
+    studentAttempts: [],
 };
 
 const quizzesSlice = createSlice({
     name: "quizzes",
     initialState,
     reducers: {
-        setQuizzes: (state, { payload }: PayloadAction<Quiz[]>) => {
-            state.quizzes = payload;
+        setQuizzes: (state, action: PayloadAction<Quiz[]>) => {
+            state.quizzes = action.payload;
         },
-        addQuiz: (state, { payload }: PayloadAction<Quiz>) => {
-            state.quizzes.push(payload);
+        setStudentAttempts: (state, action: PayloadAction<any[]>) => {
+            state.studentAttempts = action.payload; // Set attempts for the student
         },
-        deleteQuiz: (state, { payload }: PayloadAction<string>) => {
-            state.quizzes = state.quizzes.filter((q) => q._id !== payload);
+        addQuiz: (state, action: PayloadAction<Quiz>) => {
+            state.quizzes.push(action.payload);
         },
-        updateQuiz: (state, { payload }: PayloadAction<Quiz>) => {
-            state.quizzes = state.quizzes.map((q) =>
-                q._id === payload._id ? payload : q
-            );
+        deleteQuiz: (state, action: PayloadAction<string>) => {
+            state.quizzes = state.quizzes.filter((quiz) => quiz._id !== action.payload);
         },
-        addQuestionToQuiz: (
-            state,
-            { payload }: PayloadAction<{ quizId: string; question: Question }>
-        ) => {
-            console.log('Adding question:', payload); // Log to verify payload
+        updateQuiz: (state, action: PayloadAction<Quiz>) => {
+            console.log("Updating quiz with payload: ", action.payload);  // Debug log
             state.quizzes = state.quizzes.map((quiz) =>
-                quiz._id === payload.quizId
-                    ? { ...quiz, questions: [...quiz.questions, payload.question] }
-                    : quiz
+                quiz._id === action.payload._id ? action.payload : quiz
             );
         },
 
+        addQuestionToQuiz: (
+            state,
+            action: PayloadAction<{ quizId: string; question: Question }>
+        ) => {
+            const { quizId, question } = action.payload;
+            const quiz = state.quizzes.find((q) => q._id === quizId);
+            if (quiz) {
+                quiz.questions.push(question);
+                quiz.points += question.points; // Update points for the quiz
+            }
+        },
         updateQuestionInQuiz: (
             state,
-            {
-                payload,
-            }: PayloadAction<{
+            action: PayloadAction<{
                 quizId: string;
                 questionId: string;
                 updatedQuestion: Question;
             }>
         ) => {
-            state.quizzes = state.quizzes.map((quiz) =>
-                quiz._id === payload.quizId
-                    ? {
-                        ...quiz,
-                        questions: quiz.questions.map((q) =>
-                            q._id === payload.questionId ? payload.updatedQuestion : q
-                        ),
-                    }
-                    : quiz
-            );
+            const { quizId, questionId, updatedQuestion } = action.payload;
+            const quiz = state.quizzes.find((q) => q._id === quizId);
+            if (quiz) {
+                quiz.questions = quiz.questions.map((q) =>
+                    q._id === questionId ? updatedQuestion : q
+                );
+                quiz.points = quiz.questions.reduce((total, q) => total + q.points, 0); // Recalculate total points
+            }
         },
         deleteQuestionFromQuiz: (
             state,
-            {
-                payload,
-            }: PayloadAction<{ quizId: string; questionId: string }>
+            action: PayloadAction<{ quizId: string; questionId: string }>
         ) => {
-            state.quizzes = state.quizzes.map((quiz) =>
-                quiz._id === payload.quizId
-                    ? {
-                        ...quiz,
-                        questions: quiz.questions.filter(
-                            (q) => q._id !== payload.questionId
-                        ),
-                    }
-                    : quiz
-            );
+            const { quizId, questionId } = action.payload;
+            const quiz = state.quizzes.find((q) => q._id === quizId);
+            if (quiz) {
+                quiz.questions = quiz.questions.filter((q) => q._id !== questionId);
+                quiz.points = quiz.questions.reduce((total, q) => total + q.points, 0); // Recalculate total points
+            }
         },
-        editQuiz: (state, { payload }: PayloadAction<string>) => {
-            state.quizzes = state.quizzes.map((quiz) =>
-                quiz._id === payload ? { ...quiz, editing: true } : quiz
-            );
+        setQuestionsForQuiz: (
+            state,
+            action: PayloadAction<{ quizId: string; questions: Question[] }>
+        ) => {
+            const { quizId, questions } = action.payload;
+            const quiz = state.quizzes.find((q) => q._id === quizId);
+            if (quiz) {
+                quiz.questions = questions;
+                quiz.points = questions.reduce((total, q) => total + q.points, 0); // Recalculate total points
+            }
+        },
+        editQuiz: (state, action: PayloadAction<string>) => {
+            const quizId = action.payload;
+            const quiz = state.quizzes.find((q) => q._id === quizId);
+            if (quiz) {
+                quiz.editing = true;
+            }
         },
     },
 });
 
 export const {
     setQuizzes,
+    setStudentAttempts,
     addQuiz,
     deleteQuiz,
     updateQuiz,
     addQuestionToQuiz,
     updateQuestionInQuiz,
     deleteQuestionFromQuiz,
+    setQuestionsForQuiz,
     editQuiz,
 } = quizzesSlice.actions;
 

@@ -23,12 +23,13 @@ import {
 } from "./reducer";
 
 export default function Quizzes() {
-    const { cid } = useParams();
+    const { cid, uid } = useParams();
     const dispatch = useDispatch();
     const { quizzes } = useSelector((state: any) => state.quizzesReducer);
     const [quizName, setQuizName] = useState("");
     const [creatingQuiz, setCreatingQuiz] = useState(false);
     const { currentUser } = useSelector((state: any) => state.accountReducer);
+
     console.log(currentUser);
 
     useEffect(() => {
@@ -49,6 +50,8 @@ export default function Quizzes() {
             title: quizName,
             course: cid,
             description: "",
+            type: "Graded Quiz",
+            assignmentGroup: "Quizzes",
             points: 0,
             dueDate: "",
             availableFrom: "",
@@ -182,7 +185,7 @@ export default function Quizzes() {
                                  {currentUser.role === "STUDENT" && (
                                 <Link
                                     className="wd-assignment-link text-black link-underline link-underline-opacity-0"
-                                    to={`/Kambaz/courses/${cid}/quizzes/${quiz._id}/StudentView`}
+                                    to={`/Kambaz/courses/${cid}/Quizzes/${quiz._id}/StudentView`}
                                 >
                                     <b>{quiz.title || "Untitled Quiz"}</b>
                                 </Link>

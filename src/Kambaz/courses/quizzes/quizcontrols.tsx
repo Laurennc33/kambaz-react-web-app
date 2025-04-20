@@ -3,13 +3,15 @@ import QuizEditor from "./editor"; // Make sure this is the right path to your q
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-export default function QuizControls({
-  quizName,
-  setQuizName,
-}: {
-  quizName: string;
-  setQuizName: (title: string) => void;
-}) {
+export default function QuizControls(
+  // {
+  // quizName,
+//   setQuizName,
+// }: {
+//   quizName: string;
+//   setQuizName: (title: string) => void;
+// }
+) {
   const { cid, qid } = useParams();
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
@@ -44,11 +46,11 @@ export default function QuizControls({
         + Quiz
       </Button>
       <QuizEditor
-        show={show}
-        handleClose={handleClose}
-        dialogTitle="Add new Quiz"
-        quizName={quizName}
-        setQuizName={setQuizName}
+        // show={show}
+        // handleClose={handleClose}
+        // dialogTitle="Add new Quiz"
+        // quizName={quizName}
+        // setQuizName={setQuizName}
       />
     </div>
   );

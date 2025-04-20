@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from "uuid";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { GoCircleSlash } from "react-icons/go";
 import { addQuiz, updateQuiz, Quiz } from "./reducer"; // ✅ Make sure the path is correct
-import SaveButton from "./SaveButton";
 
 export default function QuizEditor() {
     const { cid, qid } = useParams();
@@ -35,7 +34,7 @@ export default function QuizEditor() {
     const [oneQuestionAtATime, setOneQuestionAtATime] = useState(false);
     const [webcamRequired, setWebcamRequired] = useState(false);
     const [lockQuestionsAfterAnswering, setLockQuestionsAfterAnswering] = useState(false);
-    
+
     const { quizzes } = useSelector((state: any) => state.quizzesReducer);
 
     useEffect(() => {
@@ -64,7 +63,7 @@ export default function QuizEditor() {
     }, [qid, quizzes]);
 
     const handleSaveQuiz = () => {
-        const newQuiz: Quiz = {
+        const updatedQuiz = {
             _id: qid || uuidv4(),
             title: quizTitle,
             course: cid!,
@@ -82,18 +81,20 @@ export default function QuizEditor() {
             dueDate: dueDate || null,
             availableDate: availableFrom || null,
             untilDate: availableUntil || null,
-            questions: [],
+            questions: [], // this might be updated if needed
             points: Number(quizPoints),
         };
-
-        if (qid) {
-            dispatch(updateQuiz(newQuiz));
-        } else {
-            dispatch(addQuiz(newQuiz));
-        }
-
-        navigate(`/Kambaz/Courses/${cid}/Quizzes/${newQuiz._id}`);
+    
+        console.log("Quiz data being saved:", updatedQuiz); // Debug log
+    
+        // Dispatch update quiz action
+        dispatch(updateQuiz(updatedQuiz));
+    
+        // Navigate to the quiz details page after saving
+        navigate(`/Kambaz/Courses/${cid}/Quizzes/${updatedQuiz._id}`);
     };
+    
+
 
     return (
         <div className="p-4">
@@ -145,7 +146,7 @@ export default function QuizEditor() {
                     <option>Ungraded Survey</option>
                 </FormSelect>
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
                 <Form.Label>Assignment Group</Form.Label>
                 <FormSelect
@@ -160,7 +161,7 @@ export default function QuizEditor() {
             </Form.Group>
 
             <Form.Group className="mb-4">
-              <b>Options</b>
+                <b>Options</b>
                 <Form.Check
                     type="checkbox"
                     label="Shuffle Answers"
@@ -173,13 +174,13 @@ export default function QuizEditor() {
                     checked={oneQuestionAtATime}
                     onChange={() => setOneQuestionAtATime(!oneQuestionAtATime)}
                 />
-                 <Form.Check
+                <Form.Check
                     type="checkbox"
                     label="Lock Questions After Answering"
                     checked={lockQuestionsAfterAnswering}
                     onChange={() => setLockQuestionsAfterAnswering(!lockQuestionsAfterAnswering)}
                 />
-                 <Form.Check
+                <Form.Check
                     type="checkbox"
                     label="Webcam Required"
                     checked={webcamRequired}
@@ -243,7 +244,7 @@ export default function QuizEditor() {
             <div className="d-flex justify-content-end gap-2">
                 <Button
                     variant="secondary"
-                    onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}
+                    onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`)}
                 >
                     Cancel
                 </Button>

@@ -11,7 +11,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import PeopleTable from "./people/table";
 import QuizPreview from "./quizzes/previewscreen";
 import { QuizProvider } from "../courses/quizzes/quizcontext";
-import StudentQuizView from "./quizzes/studentquizview";
+import QuizTakingPage from "./quizzes/quiztakingpage";
 
 export default function Courses({ courses }: { courses: any[] }) {
   const { cid } = useParams();
@@ -43,13 +43,13 @@ export default function Courses({ courses }: { courses: any[] }) {
             <Route
               path="Quizzes/*"
               element={
-                <QuizProvider>
+                <QuizProvider userId="456">
                   <Routes>
                     <Route path="" element={<Quizzes />} />
                     <Route path=":qid" element={<QuizDetails />} />
                     <Route path=":qid/Edit" element={<QuizEditor />} />
                     <Route path=":qid/Questions" element={<QuizQuestionsEditor />} />
-                    <Route path=":qid/StudentView" element={<StudentQuizView />} />
+                    <Route path=":qid/StudentView" element={<QuizTakingPage />} />
                     <Route path=":qid/Preview" element={<QuizPreview />} />
 
                   </Routes>
