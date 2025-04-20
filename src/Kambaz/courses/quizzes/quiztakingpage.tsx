@@ -102,10 +102,10 @@ export default function QuizTakingPage() {
             return;
         }
 
-        if (attemptsLeft <= 0 || lastAttempt) {
-            alert('You have already used all attempts or submitted this quiz.');
-            return;
-        }
+        // if (attemptsLeft <= 0 || lastAttempt) {
+        //     alert('You have already used all attempts or submitted this quiz.');
+        //     return;
+        // }
 
         const score = calculateScore();
         const attempt = {
@@ -170,9 +170,9 @@ export default function QuizTakingPage() {
                 </Alert>
             )}
 
-            {attemptsLeft <= 0 && (
+            {/* {attemptsLeft <= 0 && (
                 <Alert variant="warning">You have used all your attempts for this quiz.</Alert>
-            )}
+            )} */}
 
             {questions.length === 0 ? (
                 <p>No questions available.</p>

@@ -3,7 +3,7 @@ import { Button, Form, Dropdown, DropdownButton, Table } from 'react-bootstrap';
 import { FaTrashAlt } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuiz, Question } from './quizcontext';
-import { updateQuizQuestions, fetchQuestionsForQuiz } from './client'; // Assuming fetchQuizQuestions is defined
+import { updateQuizQuestions, fetchQuizQuestions } from './client'; // Assuming fetchQuizQuestions is defined
 import { v4 as uuidv4 } from 'uuid';
 
 export default function QuizQuestionsEditor() {
@@ -14,7 +14,7 @@ export default function QuizQuestionsEditor() {
         question: '',
         points: 1,
         options: ['', '', '', ''],
-        correctAnswer: '',
+        correctAnswer: '', // Ensure correctAnswer is initialized
     });
 
     const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
@@ -27,7 +27,7 @@ export default function QuizQuestionsEditor() {
         if (qid) {
             const fetchQuestions = async () => {
                 try {
-                    const fetchedQuestions = await fetchQuestionsForQuiz(qid);
+                    const fetchedQuestions = await fetchQuizQuestions(qid);
                     setQuestions(fetchedQuestions);
                 } catch (err) {
                     console.error('Failed to fetch questions:', err);
@@ -108,7 +108,7 @@ export default function QuizQuestionsEditor() {
             question: '',
             points: 1,
             options: ['', '', '', ''],
-            correctAnswer: '',
+            correctAnswer: '', // Reset the correct answer field
         });
     };
 
@@ -160,6 +160,15 @@ export default function QuizQuestionsEditor() {
             correctAnswer: value,
         }));
     };
+
+    // New handler for fill-in-the-blank questions
+    const handleFillInTheBlankAnswerSelect = (answer: string) => {
+        setNewQuestion((prev: Question) => ({
+            ...prev,
+            correctAnswer: answer,
+        }));
+    };
+
 
     return (
         <div className="quiz-questions-editor">
@@ -287,7 +296,7 @@ export default function QuizQuestionsEditor() {
                                     type="text"
                                     name="correctAnswer"
                                     value={newQuestion.correctAnswer}
-                                    onChange={handleChangeQuestion}
+                                    onChange={(e) => handleFillInTheBlankAnswerSelect(e.target.value)}
                                     placeholder="Enter correct answer"
                                 />
                             </div>

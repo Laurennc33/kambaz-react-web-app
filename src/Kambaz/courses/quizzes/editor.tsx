@@ -1,16 +1,12 @@
-import {
-    Button,
-    Form,
-    FormControl,
-    FormSelect,
-} from "react-bootstrap";
+import { Button, Form, FormControl, FormSelect } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { GoCircleSlash } from "react-icons/go";
-import { addQuiz, updateQuiz, Quiz } from "./reducer"; // ✅ Make sure the path is correct
+import axios from 'axios'; // Import axios for API requests
+import { updateQuiz } from "./reducer"; // ✅ Make sure the path is correct
 
 export default function QuizEditor() {
     const { cid, qid } = useParams();
@@ -62,16 +58,21 @@ export default function QuizEditor() {
         }
     }, [qid, quizzes]);
 
-    const handleSaveQuiz = () => {
+    const handleSaveQuiz = async () => {
+        const formattedAvailableFrom = availableFrom || null;
+        const formattedAvailableUntil = availableUntil || null;
+
+        // Handle Time Limit
+        const finalTimeLimit = timeToggle ? Number(quizTimeLimit) : 0;
         const updatedQuiz = {
-            _id: qid || uuidv4(),
+            _id: qid || uuidv4(),  // if qid exists, use it for updates, else create a new one
             title: quizTitle,
             course: cid!,
             description: quizDescription,
             type: quizType as "Graded Quiz" | "Practice Quiz" | "Exam",
             assignmentGroup: group as "Assignments" | "Quizzes" | "Exams",
             shuffleAnswers: shuffle,
-            timeLimit: timeToggle ? Number(quizTimeLimit) : 0,
+            timeLimit: finalTimeLimit,
             multipleAttempts: multiple,
             showCorrectAnswers: showCorrectAnswers,
             accessCode: accessCode,
@@ -79,21 +80,33 @@ export default function QuizEditor() {
             webcamRequired: webcamRequired,
             lockQuestionsAfterAnswering: lockQuestionsAfterAnswering,
             dueDate: dueDate || null,
-            availableDate: availableFrom || null,
-            untilDate: availableUntil || null,
-            questions: [], // this might be updated if needed
+            availableDate: formattedAvailableFrom,
+            untilDate: formattedAvailableUntil,
+            //questions: [], // Empty for now
             points: Number(quizPoints),
         };
-    
+
         console.log("Quiz data being saved:", updatedQuiz); // Debug log
-    
-        // Dispatch update quiz action
-        dispatch(updateQuiz(updatedQuiz));
-    
-        // Navigate to the quiz details page after saving
-        navigate(`/Kambaz/Courses/${cid}/Quizzes/${updatedQuiz._id}`);
+
+        try {
+            if (!qid) {
+                const response = await axios.post('http://localhost:4000/api/quizzes', updatedQuiz);
+                console.log('Quiz created successfully:', response.data);
+                dispatch(updateQuiz(response.data));
+                navigate(`/Kambaz/Courses/${cid}/Quizzes/${response.data._id}`);
+            } else {
+                const response = await axios.put(`http://localhost:4000/api/quizzes/${qid}`, updatedQuiz);
+                console.log('Quiz updated successfully:', response.data);
+                dispatch(updateQuiz(response.data));
+                navigate(`/Kambaz/Courses/${cid}/Quizzes/${response.data._id}`);
+            }
+        } catch (error) {
+            console.error('Error saving quiz:', error);
+            // Provide more helpful feedback for the user, e.g.:
+            alert("Error saving quiz. Please try again.");
+        }
+
     };
-    
 
 
     return (
@@ -107,6 +120,7 @@ export default function QuizEditor() {
                 </div>
             </div>
 
+            {/* Form for Quiz Details */}
             <FormControl
                 type="text"
                 value={quizTitle}
@@ -114,7 +128,7 @@ export default function QuizEditor() {
                 placeholder="Enter quiz title"
                 className="mb-3"
             />
-
+            {/* Instructions */}
             <h5>Quiz Instructions</h5>
             <FormControl
                 as="textarea"
@@ -125,6 +139,8 @@ export default function QuizEditor() {
                 className="mb-4"
             />
 
+            {/* Points, Quiz Type, Assignment Group */}
+            {/* These forms handle user input */}
             <Form.Group className="mb-3">
                 <Form.Label>Points</Form.Label>
                 <FormControl
@@ -160,6 +176,7 @@ export default function QuizEditor() {
                 </FormSelect>
             </Form.Group>
 
+            {/* Options */}
             <Form.Group className="mb-4">
                 <b>Options</b>
                 <Form.Check
@@ -210,6 +227,7 @@ export default function QuizEditor() {
                 onChange={() => setMultiple(!multiple)}
             />
 
+            {/* Due Date and Availability */}
             <h5>Assign</h5>
             <FormControl value="Everyone" readOnly className="mb-2" />
 
@@ -241,6 +259,7 @@ export default function QuizEditor() {
                 </Form.Group>
             </div>
 
+            {/* Save/Cancel Buttons */}
             <div className="d-flex justify-content-end gap-2">
                 <Button
                     variant="secondary"

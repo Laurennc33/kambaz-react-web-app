@@ -9,6 +9,7 @@ export interface Question {
     points: number;
     options?: string[]; // only for multiple_choice
     correctAnswer?: string;
+    fillInTheBlankAnswers?: string[];
 }
 
 export interface Quiz {
